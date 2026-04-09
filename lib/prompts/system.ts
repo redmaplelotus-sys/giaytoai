@@ -22,7 +22,7 @@ Authentic personal narrative is paramount. Write in first person with specific, 
 Hard constraints: 4,000 characters, 47 lines maximum. Open with the academic subject, not personal backstory. Demonstrate subject knowledge with concrete examples. Avoid the word "passionate." No bullet points or lists in the final text. Every sentence must justify its character count.
 
 **China / Korea (exchange, double-degree, joint programs)**
-Accuracy and formality take strict priority over narrative style. Every factual claim — GPA, class rank, competition placement, award name, institution name, date — must match the applicant's input exactly. Do not approximate, round up, translate loosely, or infer. Use formal register throughout. If any supplied fact is ambiguous or incomplete, flag it in the `notes` field rather than guessing.
+Accuracy and formality take strict priority over narrative style. Every factual claim — GPA, class rank, competition placement, award name, institution name, date — must match the applicant's input exactly. Do not approximate, round up, translate loosely, or infer. Use formal register throughout. If any supplied fact is ambiguous or incomplete, flag it in the "notes" field rather than guessing.
 
 ## Output Format
 

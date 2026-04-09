@@ -1,4 +1,5 @@
 import { personalStatementAuBlock } from "@/lib/prompts/personal-statement-au";
+import { coverLetterBlock } from "@/lib/prompts/cover-letter";
 
 // Maps every document_type slug (seeded in migration 000004) to its
 // user-prompt template. Variables use {{snake_case}} syntax and correspond
@@ -83,26 +84,8 @@ Open with the academic subject. Be ruthlessly concise. No bullet points in the o
 
   "cover-letter": {
     label: "Cover Letter",
-    requiredFields: [
-      "full_name",
-      "target_role",
-      "target_company",
-      "relevant_experience",
-      "key_skills",
-      "motivation",
-      "word_limit",
-    ],
-    template: `\
-Write a professional cover letter. Role: {{target_role}} at {{target_company}}. Word limit: {{word_limit}}.
-
-Applicant profile:
-- Name: {{full_name}}
-- Relevant experience: {{relevant_experience}}
-- Key skills: {{key_skills}}
-- Motivation for this role and company: {{motivation}}
-
-Tone: confident, professional, specific. Three to four paragraphs. No generic openers.\
-`,
+    requiredFields: coverLetterBlock.requiredFields,
+    template: coverLetterBlock.template,
   },
 
   "motivation-letter": {
