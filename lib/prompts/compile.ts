@@ -4,15 +4,49 @@ import type Anthropic from "@anthropic-ai/sdk";
 
 // ---------------------------------------------------------------------------
 // Output language registry
-// Maps sessions.answers.output_language codes to the full instruction string
-// injected into Layer 2 so every template gets a consistent language directive.
+// Maps sessions.answers.output_language codes to per-language generation
+// instructions injected into Layer 2.
 // ---------------------------------------------------------------------------
-export const OUTPUT_LANGUAGES: Record<string, string> = {
-  vi: "Vietnamese (Tiếng Việt). Use formal register appropriate for academic or professional documents.",
-  en: "English. Use formal, professional register. British or American spelling is acceptable; be consistent.",
-  ko: "Korean (한국어). Use formal 합쇼체 (–ㅂ니다 / –습니다) endings throughout.",
-  zh: "Simplified Chinese (简体中文). Use formal written register (书面语). Address the reader as 您.",
-};
+export const OUTPUT_LANGUAGES = {
+  en: {
+    label: "English",
+    instruction:
+      "English. Use formal, professional register. British or American spelling is acceptable; be consistent throughout.",
+  },
+  "zh-CN": {
+    label: "简体中文",
+    instruction:
+      "Simplified Chinese (简体中文). Use formal written register (书面语). Address the reader as 您. Do not mix Traditional Chinese characters.",
+  },
+  "zh-TW": {
+    label: "繁體中文",
+    instruction:
+      "Traditional Chinese (繁體中文). Use formal written register (書面語). Address the reader as 您. Do not mix Simplified Chinese characters.",
+  },
+  ko: {
+    label: "한국어",
+    instruction:
+      "Korean (한국어). Use formal 합쇼체 endings (–ㅂ니다 / –습니다) throughout. Avoid informal or semi-formal speech levels.",
+  },
+} satisfies Record<string, { label: string; instruction: string }>;
+
+export type OutputLanguageCode = keyof typeof OUTPUT_LANGUAGES;
+
+export const OUTPUT_LANGUAGE_CODES = Object.keys(
+  OUTPUT_LANGUAGES,
+) as OutputLanguageCode[];
+
+/**
+ * Returns the Layer 3 language directive string for Claude.
+ * Falls back gracefully for unknown codes — passes the raw code so
+ * Claude still attempts the correct language rather than silently defaulting.
+ */
+export function getOutputLanguageInstruction(code: string): string {
+  const entry = OUTPUT_LANGUAGES[code as OutputLanguageCode];
+  if (entry) return entry.instruction;
+  // Unknown code: give Claude enough to work with.
+  return `${code}. Use formal, professional register appropriate for the document type.`;
+}
 
 const VARIABLE_RE = /\{\{(\w+)\}\}/g;
 
@@ -50,12 +84,8 @@ export function compileContext(
   }
 
   // --- Layer 2: prepend output-language directive to the template ---
-  const langCode = String(answers.output_language ?? "en").toLowerCase();
-  const langInstruction =
-    OUTPUT_LANGUAGES[langCode] ??
-    `${answers.output_language}. Use formal register.`;
-
-  const layer2 = `OUTPUT LANGUAGE INSTRUCTION\nWrite the entire document in: ${langInstruction}\n\n---\n\n${tpl.template}`;
+  const langCode = String(answers.output_language ?? "en");
+  const layer2 = `OUTPUT LANGUAGE INSTRUCTION\nWrite the entire document in: ${getOutputLanguageInstruction(langCode)}\n\n---\n\n${tpl.template}`;
 
   // --- Layer 3: interpolate {{variable}} placeholders with answers ---
   const missingFields: string[] = [];
