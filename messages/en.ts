@@ -1,0 +1,220 @@
+import type { Translations } from "./vi";
+
+const en: Translations = {
+  common: {
+    loading: "Loading…",
+    saving: "Saving…",
+    error: "Something went wrong",
+    retry: "Try again",
+    back: "Back",
+    continue: "Continue",
+    cancel: "Cancel",
+    save: "Save",
+    submit: "Submit",
+    download: "Download",
+    copy: "Copy",
+    copied: "Copied",
+    edit: "Edit",
+    delete: "Delete",
+    close: "Close",
+    yes: "Yes",
+    no: "No",
+    required: "Required",
+    optional: "Optional",
+    wordCount: "{count} words",
+    charCount: "{count} characters",
+    of: "of",
+  },
+  nav: {
+    dashboard: "Dashboard",
+    history: "Document history",
+    pricing: "Pricing",
+    settings: "Settings",
+    signOut: "Sign out",
+    credits: "{count} documents remaining",
+  },
+  auth: {
+    signIn: {
+      heading: "Welcome back",
+      subheading:
+        "Sign in to continue building your study-abroad application with AI.",
+    },
+    signUp: {
+      heading: "Create an account",
+      subheading: "Start your study-abroad journey with Giấy Tờ AI.",
+      freeCreditsHeading: "2 free documents when you sign up",
+      freeCreditsBody:
+        "Draft your personal statement, cover letter, or scholarship essay — no credit card required.",
+    },
+  },
+  onboarding: {
+    setting_up: "Setting up your account…",
+    welcome_heading: "Welcome to Giấy Tờ AI!",
+    welcome_body:
+      "Your account is ready. We've given you {credits} free documents to get started.",
+    redirecting: "Redirecting to dashboard…",
+    error_heading: "Something went wrong",
+    error_body:
+      "We couldn't set up your account. Please try again or contact support.",
+  },
+  dashboard: {
+    heading: "Hello, {name}",
+    subheading: "What would you like to draft today?",
+    creditsRemaining: "{count} documents remaining",
+    creditsUnlimited: "Unlimited",
+    newDocument: "New document",
+    recentDocuments: "Recent documents",
+    noDocuments: "You don't have any documents yet. Create your first one!",
+    continueSession: "Continue",
+  },
+  documentTypes: {
+    "personal-statement-au": {
+      name: "Personal Statement (Australia)",
+      description: "Personal statement for Australian universities (UAC, VTAC).",
+    },
+    "personal-statement-us": {
+      name: "Personal Statement (United States)",
+      description: "Common App / Coalition essay for US colleges.",
+    },
+    "personal-statement-uk": {
+      name: "Personal Statement (United Kingdom)",
+      description: "UCAS personal statement, 4,000 character limit.",
+    },
+    "cover-letter": {
+      name: "Cover Letter",
+      description: "Professional cover letter for job applications.",
+    },
+    "motivation-letter": {
+      name: "Motivation Letter",
+      description: "Motivation letter for graduate programmes or scholarships.",
+    },
+    "scholarship-essay": {
+      name: "Scholarship Essay",
+      description:
+        "Essay responding to scholarship prompts (merit, leadership, need).",
+    },
+    "translation-prep": {
+      name: "Document Translation",
+      description:
+        "Translation draft of official documents into English, Korean, or Chinese.",
+    },
+    "reference-letter": {
+      name: "Reference Letter",
+      description: "Reference letter drafted for a recommender to review and sign.",
+    },
+  },
+  session: {
+    status: {
+      pending: "Pending",
+      processing: "Processing",
+      completed: "Completed",
+      failed: "Failed",
+    },
+    step: {
+      selectType: "Select document type",
+      fillAnswers: "Enter your details",
+      generate: "Generate document",
+      review: "Review & export",
+    },
+    answersHeading: "Your details",
+    answersSubheading:
+      "Fill in completely so the AI can produce the most accurate document.",
+    missingFields: "Missing information: {fields}",
+    outputLanguage: "Output language",
+    outputLanguagePlaceholder: "Select language",
+  },
+  outputLanguages: {
+    vi: "Vietnamese",
+    en: "English",
+    ko: "Korean",
+    zh: "Simplified Chinese",
+  },
+  generation: {
+    heading: "Generating your document…",
+    subheading: "Usually takes 15–30 seconds. Please don't close this page.",
+    done: "Document ready",
+    revise: "Regenerate",
+    revisePrompt: "What would you like to change?",
+    creditsUsed: "1 document used",
+  },
+  quality: {
+    heading: "Quality check",
+    wordCount: {
+      ok: "Word count on target ({actual}/{target})",
+      over: "{delta} words over the limit",
+      under: "{delta} words under the target",
+      unknown: "{actual} words (no limit set)",
+    },
+    tone: "Tone",
+    specificity: "Specificity",
+    warnings: "Issues to address",
+    strengths: "Strengths",
+    noWarnings: "No issues detected.",
+    score: "{score}/5",
+  },
+  safety: {
+    block_heading: "Document cannot be generated",
+    block_body:
+      "The system detected a request to fabricate credentials. Giấy Tờ AI only supports presenting your real achievements.",
+    warn_heading: "Please check your information",
+    warn_body:
+      "Some of the information you provided may need verification. The document was generated but please ensure all details are accurate.",
+  },
+  export: {
+    heading: "Export document",
+    format: "Format",
+    formats: {
+      pdf: "PDF",
+      docx: "Word (.docx)",
+      html: "HTML",
+    },
+    download: "Download",
+    preparing: "Preparing file…",
+    ready: "File ready",
+    expires: "Link expires in 24 hours",
+  },
+  feedback: {
+    heading: "Was this document helpful?",
+    ratingLabel: "Rating",
+    commentPlaceholder: "Additional comments (optional)…",
+    submit: "Submit feedback",
+    thankYou: "Thank you for your feedback!",
+    skip: "Skip",
+  },
+  history: {
+    heading: "Document history",
+    empty: "You don't have any documents yet.",
+    createdAt: "Created {date}",
+    viewDraft: "View draft",
+    downloadExport: "Download",
+  },
+  pricing: {
+    heading: "Pricing",
+    subheading: "Choose the plan that fits your needs.",
+    free: {
+      name: "Free",
+      price: "$0",
+      documents: "2 documents",
+      cta: "Get started free",
+    },
+    starter: { name: "Starter", documents: "10 documents", cta: "Buy now" },
+    standard: { name: "Standard", documents: "30 documents", cta: "Buy now" },
+    pro: { name: "Pro", documents: "100 documents", cta: "Buy now" },
+    unlimited: { name: "Unlimited", documents: "Unlimited", cta: "Buy now" },
+    perDocument: "/ document",
+    mostPopular: "Most popular",
+    paymentMethods: "Pay with VNPay, Momo, or international card",
+  },
+  errors: {
+    generic: "An error occurred. Please try again.",
+    unauthorized: "You need to sign in to do that.",
+    notFound: "The requested content was not found.",
+    noCredits: "You have no documents remaining. Please upgrade your plan.",
+    sessionFailed:
+      "Document generation failed. Your credit has been refunded.",
+    exportFailed: "Could not export the document. Please try again.",
+    invalidInput: "Invalid input: {details}",
+  },
+};
+
+export default en;

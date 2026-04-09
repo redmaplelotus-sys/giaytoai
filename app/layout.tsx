@@ -24,7 +24,7 @@ const DEFAULT_LOCALE = "vi";
 
 async function loadMessages(locale: string): Promise<Record<string, unknown>> {
   try {
-    return (await import(`@/messages/${locale}.json`)).default;
+    return (await import(`@/messages/${locale}`)).default;
   } catch {
     return {};
   }
