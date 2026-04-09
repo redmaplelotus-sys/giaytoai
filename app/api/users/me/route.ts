@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
-const SUPPORTED_LOCALES = ["vi", "en"] as const;
+const SUPPORTED_LOCALES = ["vi", "en", "ko", "zh"] as const;
 type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 export async function PATCH(request: Request) {

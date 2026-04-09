@@ -2,7 +2,7 @@
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { viVN } from "@clerk/localizations";
-import { NextIntlClientProvider } from "next-intl";
+import { I18nProvider } from "@/lib/i18n";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
 import posthog from "posthog-js";
 import { useEffect, Suspense } from "react";
@@ -48,12 +48,12 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
   return (
     <ClerkProvider localization={viVN}>
       <SentryUserContext />
-      <NextIntlClientProvider locale={locale} messages={messages}>
+      <I18nProvider locale={locale} messages={messages}>
         <PHProvider client={posthog}>
           <PageViewTracker />
           {children}
         </PHProvider>
-      </NextIntlClientProvider>
+      </I18nProvider>
     </ClerkProvider>
   );
 }
