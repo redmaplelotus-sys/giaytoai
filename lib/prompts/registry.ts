@@ -1,3 +1,5 @@
+import { personalStatementAuBlock } from "@/lib/prompts/personal-statement-au";
+
 // Maps every document_type slug (seeded in migration 000004) to its
 // user-prompt template. Variables use {{snake_case}} syntax and correspond
 // to keys in sessions.answers (JSONB).
@@ -28,28 +30,8 @@ export interface PromptTemplate {
 export const PROMPT_REGISTRY: Record<DocTypeSlug, PromptTemplate> = {
   "personal-statement-au": {
     label: "Personal Statement (Australia)",
-    requiredFields: [
-      "full_name",
-      "target_university",
-      "target_degree",
-      "why_australia",
-      "academic_background",
-      "achievements",
-      "career_goal",
-      "word_limit",
-    ],
-    template: `\
-Write an Australian university personal statement for the following applicant. Target university: {{target_university}}. Degree: {{target_degree}}. Word limit: {{word_limit}}.
-
-Applicant profile:
-- Name: {{full_name}}
-- Academic background: {{academic_background}}
-- Key achievements: {{achievements}}
-- Why Australia / this university: {{why_australia}}
-- Career goal: {{career_goal}}
-
-Tone: direct, outcomes-focused, confident. Open with the strongest achievement or clearest motivation. No preamble.\
-`,
+    requiredFields: personalStatementAuBlock.requiredFields,
+    template: personalStatementAuBlock.template,
   },
 
   "personal-statement-us": {
