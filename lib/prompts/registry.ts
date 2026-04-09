@@ -1,5 +1,6 @@
 import { personalStatementAuBlock } from "@/lib/prompts/personal-statement-au";
 import { coverLetterBlock } from "@/lib/prompts/cover-letter";
+import { translationDraftBlock } from "@/lib/prompts/translation-draft";
 
 // Maps every document_type slug (seeded in migration 000004) to its
 // user-prompt template. Variables use {{snake_case}} syntax and correspond
@@ -144,24 +145,8 @@ Address the prompt directly. Lead with impact. Avoid vague statements of gratitu
 
   "translation-prep": {
     label: "Translation Prep",
-    requiredFields: [
-      "document_type",
-      "source_text_vi",
-      "target_language",
-      "purpose",
-    ],
-    template: `\
-Restructure and clarify the following Vietnamese source text to prepare it for certified translation into {{target_language}}. Document type: {{document_type}}. Purpose: {{purpose}}.
-
-Source text (Vietnamese):
-{{source_text_vi}}
-
-Tasks:
-1. Identify and flag any ambiguous terms, abbreviations, or institution names that a translator must verify.
-2. Rewrite unclear passages in plain Vietnamese without changing facts.
-3. Return the cleaned Vietnamese text in the body field.
-4. List all flagged items in the notes field.\
-`,
+    requiredFields: translationDraftBlock.requiredFields,
+    template: translationDraftBlock.template,
   },
 
   "reference-letter": {
