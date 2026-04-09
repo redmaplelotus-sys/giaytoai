@@ -1,1 +1,237 @@
-{}
+{
+  "common": {
+    "loading": "Đang tải…",
+    "saving": "Đang lưu…",
+    "error": "Có lỗi xảy ra",
+    "retry": "Thử lại",
+    "back": "Quay lại",
+    "continue": "Tiếp tục",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "submit": "Gửi",
+    "download": "Tải xuống",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "close": "Đóng",
+    "yes": "Có",
+    "no": "Không",
+    "required": "Bắt buộc",
+    "optional": "Tùy chọn",
+    "wordCount": "{count} từ",
+    "charCount": "{count} ký tự",
+    "of": "trên"
+  },
+
+  "nav": {
+    "dashboard": "Trang chủ",
+    "history": "Lịch sử tài liệu",
+    "pricing": "Bảng giá",
+    "settings": "Cài đặt",
+    "signOut": "Đăng xuất",
+    "credits": "{count} tài liệu còn lại"
+  },
+
+  "auth": {
+    "signIn": {
+      "heading": "Chào mừng trở lại",
+      "subheading": "Đăng nhập để tiếp tục soạn thảo hồ sơ du học của bạn với sự hỗ trợ của AI."
+    },
+    "signUp": {
+      "heading": "Tạo tài khoản",
+      "subheading": "Bắt đầu hành trình du học cùng Giấy Tờ AI.",
+      "freeCreditsHeading": "Tặng 2 tài liệu miễn phí khi đăng ký",
+      "freeCreditsBody": "Soạn thảo ngay personal statement, cover letter, hay bài luận học bổng — không cần thẻ tín dụng."
+    }
+  },
+
+  "onboarding": {
+    "setting_up": "Đang thiết lập tài khoản…",
+    "welcome_heading": "Chào mừng bạn đến với Giấy Tờ AI!",
+    "welcome_body": "Tài khoản của bạn đã sẵn sàng. Chúng tôi đã tặng bạn {credits} tài liệu miễn phí để bắt đầu.",
+    "redirecting": "Đang chuyển hướng đến bảng điều khiển…",
+    "error_heading": "Có lỗi xảy ra",
+    "error_body": "Không thể thiết lập tài khoản. Vui lòng thử lại hoặc liên hệ hỗ trợ."
+  },
+
+  "dashboard": {
+    "heading": "Xin chào, {name}",
+    "subheading": "Bạn muốn soạn thảo tài liệu gì hôm nay?",
+    "creditsRemaining": "Còn {count} tài liệu",
+    "creditsUnlimited": "Không giới hạn",
+    "newDocument": "Tạo tài liệu mới",
+    "recentDocuments": "Tài liệu gần đây",
+    "noDocuments": "Bạn chưa có tài liệu nào. Hãy tạo tài liệu đầu tiên!",
+    "continueSession": "Tiếp tục"
+  },
+
+  "documentTypes": {
+    "personal-statement-au": {
+      "name": "Personal Statement (Úc)",
+      "description": "Bài luận cá nhân dành cho các trường đại học Úc (UAC, VTAC)."
+    },
+    "personal-statement-us": {
+      "name": "Personal Statement (Mỹ)",
+      "description": "Bài luận Common App / Coalition dành cho các trường đại học Mỹ."
+    },
+    "personal-statement-uk": {
+      "name": "Personal Statement (Anh)",
+      "description": "UCAS personal statement, giới hạn 4.000 ký tự."
+    },
+    "cover-letter": {
+      "name": "Thư xin việc",
+      "description": "Cover letter chuyên nghiệp cho đơn xin việc."
+    },
+    "motivation-letter": {
+      "name": "Thư động lực",
+      "description": "Motivation letter cho chương trình sau đại học hoặc học bổng."
+    },
+    "scholarship-essay": {
+      "name": "Bài luận học bổng",
+      "description": "Essay trả lời câu hỏi học bổng (thành tích, lãnh đạo, tài chính)."
+    },
+    "translation-prep": {
+      "name": "Bản dịch tài liệu",
+      "description": "Dịch nháp tài liệu chính thức sang tiếng Anh, Hàn, hoặc Trung."
+    },
+    "reference-letter": {
+      "name": "Thư giới thiệu",
+      "description": "Thư giới thiệu soạn sẵn để người giới thiệu xem xét và ký."
+    }
+  },
+
+  "session": {
+    "status": {
+      "pending": "Chờ xử lý",
+      "processing": "Đang xử lý",
+      "completed": "Hoàn thành",
+      "failed": "Thất bại"
+    },
+    "step": {
+      "selectType": "Chọn loại tài liệu",
+      "fillAnswers": "Nhập thông tin",
+      "generate": "Tạo tài liệu",
+      "review": "Xem xét & xuất"
+    },
+    "answersHeading": "Thông tin của bạn",
+    "answersSubheading": "Điền đầy đủ để AI tạo ra tài liệu chính xác nhất.",
+    "missingFields": "Thiếu thông tin: {fields}",
+    "outputLanguage": "Ngôn ngữ đầu ra",
+    "outputLanguagePlaceholder": "Chọn ngôn ngữ"
+  },
+
+  "outputLanguages": {
+    "vi": "Tiếng Việt",
+    "en": "Tiếng Anh",
+    "ko": "Tiếng Hàn",
+    "zh": "Tiếng Trung (Giản thể)"
+  },
+
+  "generation": {
+    "heading": "Đang tạo tài liệu…",
+    "subheading": "Thường mất 15–30 giây. Vui lòng không đóng trang.",
+    "done": "Tài liệu đã sẵn sàng",
+    "revise": "Tạo lại",
+    "revisePrompt": "Bạn muốn thay đổi điều gì?",
+    "creditsUsed": "Đã sử dụng 1 tài liệu"
+  },
+
+  "quality": {
+    "heading": "Đánh giá chất lượng",
+    "wordCount": {
+      "ok": "Số từ phù hợp ({actual}/{target})",
+      "over": "Vượt {delta} từ so với giới hạn",
+      "under": "Thiếu {delta} từ so với yêu cầu",
+      "unknown": "{actual} từ (không có giới hạn)"
+    },
+    "tone": "Giọng văn",
+    "specificity": "Độ cụ thể",
+    "warnings": "Cần chú ý",
+    "strengths": "Điểm tốt",
+    "noWarnings": "Không có vấn đề nào được phát hiện.",
+    "score": "{score}/5"
+  },
+
+  "safety": {
+    "block_heading": "Không thể tạo tài liệu",
+    "block_body": "Hệ thống phát hiện nội dung yêu cầu tạo thông tin giả mạo. Giấy Tờ AI chỉ hỗ trợ trình bày thành tích thực tế của bạn.",
+    "warn_heading": "Kiểm tra lại thông tin",
+    "warn_body": "Một số thông tin bạn cung cấp có thể cần xác nhận lại. Tài liệu vẫn được tạo nhưng hãy đảm bảo mọi thông tin đều chính xác."
+  },
+
+  "export": {
+    "heading": "Xuất tài liệu",
+    "format": "Định dạng",
+    "formats": {
+      "pdf": "PDF",
+      "docx": "Word (.docx)",
+      "html": "HTML"
+    },
+    "download": "Tải xuống",
+    "preparing": "Đang chuẩn bị file…",
+    "ready": "File đã sẵn sàng",
+    "expires": "Link hết hạn sau 24 giờ"
+  },
+
+  "feedback": {
+    "heading": "Tài liệu này có hữu ích không?",
+    "ratingLabel": "Đánh giá",
+    "commentPlaceholder": "Nhận xét thêm (tùy chọn)…",
+    "submit": "Gửi đánh giá",
+    "thankYou": "Cảm ơn phản hồi của bạn!",
+    "skip": "Bỏ qua"
+  },
+
+  "history": {
+    "heading": "Lịch sử tài liệu",
+    "empty": "Bạn chưa có tài liệu nào.",
+    "createdAt": "Tạo lúc {date}",
+    "viewDraft": "Xem bản thảo",
+    "downloadExport": "Tải file"
+  },
+
+  "pricing": {
+    "heading": "Bảng giá",
+    "subheading": "Chọn gói phù hợp với nhu cầu của bạn.",
+    "free": {
+      "name": "Miễn phí",
+      "price": "0 đ",
+      "documents": "2 tài liệu",
+      "cta": "Bắt đầu miễn phí"
+    },
+    "starter": {
+      "name": "Starter",
+      "documents": "10 tài liệu",
+      "cta": "Mua ngay"
+    },
+    "standard": {
+      "name": "Standard",
+      "documents": "30 tài liệu",
+      "cta": "Mua ngay"
+    },
+    "pro": {
+      "name": "Pro",
+      "documents": "100 tài liệu",
+      "cta": "Mua ngay"
+    },
+    "unlimited": {
+      "name": "Unlimited",
+      "documents": "Không giới hạn",
+      "cta": "Mua ngay"
+    },
+    "perDocument": "/ tài liệu",
+    "mostPopular": "Phổ biến nhất",
+    "paymentMethods": "Thanh toán qua VNPay, Momo, thẻ quốc tế"
+  },
+
+  "errors": {
+    "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "unauthorized": "Bạn cần đăng nhập để thực hiện thao tác này.",
+    "notFound": "Không tìm thấy nội dung yêu cầu.",
+    "noCredits": "Bạn đã hết lượt tài liệu. Vui lòng nâng cấp gói.",
+    "sessionFailed": "Phiên tạo tài liệu thất bại. Lượt của bạn đã được hoàn trả.",
+    "exportFailed": "Không thể xuất tài liệu. Vui lòng thử lại.",
+    "invalidInput": "Dữ liệu nhập không hợp lệ: {details}"
+  }
+}
