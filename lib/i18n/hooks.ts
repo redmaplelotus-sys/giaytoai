@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import type { Translations } from "@/messages/vi";
 import { interpolate } from "./interpolate";
 import { useI18nContext, type Locale } from "./provider";
+import type { TranslationKey, NamespaceKey } from "./types";
 
 export type Params = Record<string, string | number>;
 
@@ -32,10 +33,10 @@ function getNestedString(obj: unknown, path: string): string | undefined {
  *   t('common.loading')
  *   t('nav.credits', { count: 3 })
  */
-export function useT(): (key: string, params?: Params) => string;
+export function useT(): (key: TranslationKey, params?: Params) => string;
 export function useT<N extends keyof Translations>(
   namespace: N,
-): (key: keyof Translations[N] & string, params?: Params) => string;
+): (key: NamespaceKey<N>, params?: Params) => string;
 export function useT(namespace?: string) {
   const { messages } = useI18nContext();
   return useCallback(
