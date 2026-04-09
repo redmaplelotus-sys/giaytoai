@@ -8,6 +8,7 @@ import posthog from "posthog-js";
 import { useEffect, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { clientEnv } from "@/lib/env";
+import { SentryUserContext } from "@/app/components/SentryUserContext";
 
 if (typeof window !== "undefined") {
   posthog.init(clientEnv.posthogKey, {
@@ -46,6 +47,7 @@ interface ProvidersProps {
 export function Providers({ children, locale, messages }: ProvidersProps) {
   return (
     <ClerkProvider localization={viVN}>
+      <SentryUserContext />
       <NextIntlClientProvider locale={locale} messages={messages}>
         <PHProvider client={posthog}>
           <PageViewTracker />
