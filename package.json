@@ -12,6 +12,7 @@
     "deploy": "vercel --prod"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.86.1",
     "@clerk/localizations": "^4.4.0",
     "@clerk/nextjs": "^7.0.12",
     "@sentry/nextjs": "^10.47.0",
