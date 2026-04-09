@@ -10,17 +10,6 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Check if user already exists to make this endpoint idempotent.
-  const { data: existing } = await supabaseAdmin
-    .from("users")
-    .select("clerk_id")
-    .eq("clerk_id", userId)
-    .single();
-
-  if (existing) {
-    return NextResponse.json({ status: "exists" });
-  }
-
   const clerkUser = await currentUser();
   if (!clerkUser) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -32,21 +21,25 @@ export async function POST() {
   }
 
   const fullName =
-    [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") ||
-    null;
+    [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || null;
 
-  const { error } = await supabaseAdmin.from("users").insert({
-    clerk_id: userId,
-    email,
-    full_name: fullName,
-    avatar_url: clerkUser.imageUrl ?? null,
-    credits_remaining: FREE_CREDITS,
-  });
+  // ON CONFLICT (clerk_id) DO NOTHING — safe to call multiple times.
+  // An existing row is left completely untouched, so credits are never reset.
+  const { error } = await supabaseAdmin.from("users").upsert(
+    {
+      clerk_id: userId,
+      email,
+      full_name: fullName,
+      avatar_url: clerkUser.imageUrl ?? null,
+      credits_remaining: FREE_CREDITS,
+    },
+    { onConflict: "clerk_id", ignoreDuplicates: true },
+  );
 
   if (error) {
     console.error("[users/setup]", error);
     return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
   }
 
-  return NextResponse.json({ status: "created", credits: FREE_CREDITS });
+  return NextResponse.json({ status: "ok", credits: FREE_CREDITS });
 }
