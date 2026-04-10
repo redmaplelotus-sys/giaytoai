@@ -35,34 +35,44 @@ export async function POST(request: Request) {
   const outputLang = String(answers?.output_language ?? "en");
   if (!OUTPUT_LANGUAGE_CODES.includes(outputLang as never)) {
     return NextResponse.json(
-      { error: `Invalid output_language. Must be one of: ${OUTPUT_LANGUAGE_CODES.join(", ")}` },
+      {
+        error: `Invalid output_language. Must be one of: ${OUTPUT_LANGUAGE_CODES.join(", ")}`,
+      },
       { status: 422 },
     );
   }
 
-  // Resolve slug → document_type row
-  const { data: docType, error: dtError } = await supabaseAdmin
-    .from("document_types")
-    .select("id, name_en")
-    .eq("slug", slug)
-    .single();
+  // Resolve doc type and user in parallel
+  const [docTypeResult, userResult] = await Promise.all([
+    supabaseAdmin
+      .from("document_types")
+      .select("id")
+      .eq("slug", slug)
+      .single(),
+    supabaseAdmin
+      .from("users")
+      .select("id, credits_remaining, plan")
+      .eq("clerk_id", userId)
+      .single(),
+  ]);
 
-  if (dtError || !docType) {
+  if (docTypeResult.error || !docTypeResult.data) {
     return NextResponse.json({ error: "Document type not found" }, { status: 404 });
   }
 
-  // Resolve clerk_id → internal user UUID
-  const { data: user, error: userError } = await supabaseAdmin
-    .from("users")
-    .select("id")
-    .eq("clerk_id", userId)
-    .single();
-
-  if (userError || !user) {
+  if (userResult.error || !userResult.data) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const session = await createSession(user.id, docType.id);
+  const { id: documentTypeId } = docTypeResult.data;
+  const { id: internalUserId, credits_remaining, plan } = userResult.data;
+
+  // Credit gate — unlimited plan bypasses the check
+  if (plan !== "unlimited" && credits_remaining <= 0) {
+    return NextResponse.json({ error: "no_credits" }, { status: 402 });
+  }
+
+  const session = await createSession(internalUserId, documentTypeId);
   await saveAnswers(session.id, answers);
 
   return NextResponse.json({ id: session.id }, { status: 201 });

@@ -138,8 +138,12 @@ export default function NewSessionPage() {
         const data = await res.json().catch(() => ({}));
         throw new Error((data as { error?: string }).error ?? res.statusText);
       }
-      const { id } = (await res.json()) as { id: string };
-      router.push(`/session/${id}`);
+      const data = await res.json();
+      if (!res.ok) {
+        const code = (data as { error?: string }).error;
+        throw new Error(code === "no_credits" ? "no_credits" : (code ?? res.statusText));
+      }
+      router.push(`/session/${(data as { id: string }).id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
       setSubmitting(false);
@@ -285,7 +289,7 @@ export default function NewSessionPage() {
       {/* ── Error ── */}
       {error && (
         <p role="alert" className="text-sm text-red-600 dark:text-red-400">
-          {error}
+          {error === "no_credits" ? m.errors.noCredits : (m.errors.generic)}
         </p>
       )}
 
