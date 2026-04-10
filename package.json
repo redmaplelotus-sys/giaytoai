@@ -49,6 +49,7 @@
     "@types/sharp": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
+    "supabase": "^2.89.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

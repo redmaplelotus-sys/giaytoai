@@ -2,6 +2,18 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
+
+// ---------------------------------------------------------------------------
+// Backwards-compat helper: old drafts were saved as raw JSON. Extract body.
+// ---------------------------------------------------------------------------
+function extractDraftText(raw: string): string {
+  if (!raw.trimStart().startsWith("{")) return raw;
+  try {
+    const parsed = JSON.parse(raw) as { body?: string };
+    if (typeof parsed.body === "string") return parsed.body;
+  } catch { /* not JSON */ }
+  return raw;
+}
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useT } from "@/lib/i18n";
@@ -229,7 +241,7 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
           .filter((d) => d.content?.text)
           .map((d) => ({
             id:        d.id,
-            text:      d.content.html ?? d.content.text!,
+            text:      d.content.html ?? extractDraftText(d.content.text!),
             createdAt: d.created_at,
             quality:   d.quality_data ?? null,
           }));

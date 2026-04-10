@@ -247,6 +247,20 @@ export function useGenerateStream(editor: Editor | null) {
             const serverFirstTokenMs = data.firstTokenMs as number | null;
             const serverTotalMs      = data.totalMs      as number | null;
 
+            // If Claude returned JSON (legacy system prompt), extract body only.
+            if (editor) {
+              const raw = editor.getText();
+              if (raw.trimStart().startsWith("{")) {
+                try {
+                  const parsed = JSON.parse(raw) as { body?: string };
+                  if (typeof parsed.body === "string") {
+                    editor.commands.clearContent(false);
+                    editor.commands.setContent(parsed.body);
+                  }
+                } catch { /* not JSON, leave as-is */ }
+              }
+            }
+
             setState((s) => ({
               ...s,
               phase:        "complete",

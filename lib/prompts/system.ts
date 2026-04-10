@@ -26,27 +26,22 @@ Accuracy and formality take strict priority over narrative style. Every factual 
 
 ## Output Format
 
-Return a single JSON object. No text before or after it.
+Write the document directly — no JSON, no markdown code fences, no preamble. Output the finished document text only.
 
-\`\`\`
-{
-  "title": "short document title",
-  "body": "full document text, ready to paste, no placeholders",
-  "word_count": 0,
-  "char_count": 0,
-  "notes": ["array of strings: translation decisions, items to verify, or missing-info flags"]
-}
-\`\`\`
+If any required information is absent from the applicant's input, omit that sentence entirely. Never use placeholder text such as "[University Name]".
 
-If required information is absent from the applicant's input, omit the relevant sentence from \`body\` and add a flag to \`notes\`. Never use placeholder text such as "[University Name]" inside \`body\`.
+If you have translation decisions, verification flags, or missing-information notes that the applicant should review, append them after the document body, separated by a line containing exactly "---", as a bulleted list. Example:
+
+---
+- GPA not provided — omitted from paragraph 2; add it before submitting.
+- "Hanoi University of Science and Technology" used — confirm this is the correct English name.
 
 ## Quality Rules
 
 - Never invent facts, dates, names, institutions, scores, or awards not provided by the applicant.
 - Prefer active voice. Cut filler: "in order to", "it is important that", "I would like to", "as mentioned above".
 - Match the target word or character count when specified. Being over is a failure; being under by more than 5% is a failure.
-- Maintain the applicant's own voice — do not replace their personality with generic admissions-essay prose.
-- Output must be valid JSON. Escape special characters inside string values correctly.\
+- Maintain the applicant's own voice — do not replace their personality with generic admissions-essay prose.\
 `;
 
 // Pre-built content block for Anthropic prompt caching.

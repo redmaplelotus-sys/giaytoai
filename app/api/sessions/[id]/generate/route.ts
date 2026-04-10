@@ -187,9 +187,17 @@ export async function POST(
         if (!doneChunk) throw new Error("Stream ended without done event");
 
         // ── 9a. Save draft ─────────────────────────────────────────────────
+        // If Claude returned JSON (legacy), extract the body field before saving.
+        let saveText = fullText;
+        if (fullText.trimStart().startsWith("{")) {
+          try {
+            const parsed = JSON.parse(fullText) as { body?: string };
+            if (typeof parsed.body === "string") saveText = parsed.body;
+          } catch { /* not JSON */ }
+        }
         await completeDraft(
           draftId,
-          { text: fullText },
+          { text: saveText },
           "claude-opus-4-6",
           doneChunk.inputTokens + doneChunk.outputTokens,
         );
@@ -199,7 +207,7 @@ export async function POST(
         // ── 9b. Quality check (non-blocking — don't delay SSE done event) ─
         let quality = null;
         try {
-          quality = await checkQualityAsync(fullText, docTypeName, targetWords);
+          quality = await checkQualityAsync(saveText, docTypeName, targetWords);
           const score = Math.round(
             (quality.toneScore + quality.specificityScore) / 2,
           ) as 1 | 2 | 3 | 4 | 5;
