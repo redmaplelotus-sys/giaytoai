@@ -14,30 +14,30 @@ function required(value: string | undefined, name: string): string {
 }
 
 export const clientEnv = {
-  // Clerk
-  clerkPublishableKey:    required(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"),
-  clerkSignInUrl:         required(process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,         "NEXT_PUBLIC_CLERK_SIGN_IN_URL"),
-  clerkSignUpUrl:         required(process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,         "NEXT_PUBLIC_CLERK_SIGN_UP_URL"),
-  clerkAfterSignInUrl:    required(process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,   "NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL"),
-  clerkAfterSignUpUrl:    required(process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,   "NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL"),
+  // Clerk — required
+  clerkPublishableKey:  required(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,  "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"),
+  clerkSignInUrl:       required(process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,       "NEXT_PUBLIC_CLERK_SIGN_IN_URL"),
+  clerkSignUpUrl:       required(process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,       "NEXT_PUBLIC_CLERK_SIGN_UP_URL"),
+  clerkAfterSignInUrl:  required(process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL, "NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL"),
+  clerkAfterSignUpUrl:  required(process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL, "NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL"),
 
-  // Supabase
-  supabaseUrl:            required(process.env.NEXT_PUBLIC_SUPABASE_URL,              "NEXT_PUBLIC_SUPABASE_URL"),
-  supabaseAnonKey:        required(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,         "NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+  // Supabase — required
+  supabaseUrl:          required(process.env.NEXT_PUBLIC_SUPABASE_URL,            "NEXT_PUBLIC_SUPABASE_URL"),
+  supabaseAnonKey:      required(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,       "NEXT_PUBLIC_SUPABASE_ANON_KEY"),
 
-  // Stripe
-  stripePublishableKey:   required(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"),
+  // App — required
+  appUrl:               required(process.env.NEXT_PUBLIC_APP_URL,                 "NEXT_PUBLIC_APP_URL"),
 
-  // Trigger.dev
-  triggerPublicApiKey:    required(process.env.NEXT_PUBLIC_TRIGGER_PUBLIC_API_KEY,    "NEXT_PUBLIC_TRIGGER_PUBLIC_API_KEY"),
+  // Stripe — optional (payment UI hidden when unset)
+  stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
 
-  // Sentry
-  sentryDsn:              required(process.env.NEXT_PUBLIC_SENTRY_DSN,                "NEXT_PUBLIC_SENTRY_DSN"),
+  // Trigger.dev — optional
+  triggerPublicApiKey:  process.env.NEXT_PUBLIC_TRIGGER_PUBLIC_API_KEY,
 
-  // PostHog
-  posthogKey:             required(process.env.NEXT_PUBLIC_POSTHOG_KEY,               "NEXT_PUBLIC_POSTHOG_KEY"),
-  posthogHost:            required(process.env.NEXT_PUBLIC_POSTHOG_HOST,              "NEXT_PUBLIC_POSTHOG_HOST"),
+  // Sentry — optional
+  sentryDsn:            process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-  // App
-  appUrl:                 required(process.env.NEXT_PUBLIC_APP_URL,                   "NEXT_PUBLIC_APP_URL"),
+  // PostHog — optional
+  posthogKey:           process.env.NEXT_PUBLIC_POSTHOG_KEY,
+  posthogHost:          process.env.NEXT_PUBLIC_POSTHOG_HOST,
 };

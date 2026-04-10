@@ -10,9 +10,9 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { clientEnv } from "@/lib/env";
 import { SentryUserContext } from "@/app/components/SentryUserContext";
 
-if (typeof window !== "undefined") {
+if (typeof window !== "undefined" && clientEnv.posthogKey) {
   posthog.init(clientEnv.posthogKey, {
-    api_host: clientEnv.posthogHost,
+    api_host: clientEnv.posthogHost ?? "https://app.posthog.com",
     capture_pageview: false, // handled manually by PageViewTracker
     capture_pageleave: true,
   });
