@@ -122,8 +122,8 @@ const NAV_LINKS_GUEST  = ["pricing"] as const;
 type NavKey = (typeof NAV_LINKS_AUTH)[number];
 
 const LINK_HREF: Record<NavKey, string> = {
-  dashboard: "/dashboard",
-  history:   "/dashboard",   // placeholder until /history page exists
+  dashboard: "/",
+  history:   "/dashboard",
   pricing:   "/pricing",
 };
 
