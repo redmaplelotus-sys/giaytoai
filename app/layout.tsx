@@ -23,11 +23,10 @@ export const metadata: Metadata = {
 const DEFAULT_LOCALE = "vi";
 
 async function loadMessages(locale: string): Promise<Record<string, unknown>> {
-  try {
-    return (await import(`@/messages/${locale}`)).default;
-  } catch {
-    return {};
-  }
+  if (locale === "en") return (await import("@/messages/en")).default;
+  if (locale === "ko") return (await import("@/messages/ko")).default;
+  if (locale === "zh") return (await import("@/messages/zh")).default;
+  return (await import("@/messages/vi")).default;
 }
 
 export default async function RootLayout({
