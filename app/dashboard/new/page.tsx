@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useT, useTA } from "@/lib/i18n";
+import { DocTypePreviewCard } from "@/app/components/DocTypePreviewCard";
 import { OUTPUT_LANGUAGES, type OutputLanguageCode } from "@/lib/prompts/compile";
 import type { DocTypeSlug } from "@/lib/prompts/registry";
 
@@ -279,12 +280,8 @@ export default function NewSessionPage() {
         <p className="text-xs text-neutral-400">{t("wordCountHint")}</p>
       </section>
 
-      {/* ── Resolved doc type indicator ── */}
-      {slug && (
-        <p className="text-sm text-neutral-500">
-          {t("resolvedType", { type: m.documentTypes[slug].name })}
-        </p>
-      )}
+      {/* ── Resolved doc type preview ── */}
+      {slug && <DocTypePreviewCard slug={slug} />}
 
       {/* ── Error ── */}
       {error && (
