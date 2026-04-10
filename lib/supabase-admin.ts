@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
-import { clientEnv, serverEnv } from "@/lib/env";
+import { clientEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/server-env";
 
 /**
  * Service-role admin client — bypasses RLS entirely.
