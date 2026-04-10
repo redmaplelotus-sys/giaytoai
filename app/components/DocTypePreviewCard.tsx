@@ -70,46 +70,57 @@ export function DocTypePreviewCard({ slug }: DocTypePreviewCardProps) {
   const excerpt = SAMPLE_EXCERPTS[slug];
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5 space-y-3 dark:border-neutral-800 dark:bg-neutral-950">
+    <div className="card p-5 space-y-3">
       {/* Slug badge */}
-      <span className="inline-block rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+      <span
+        className="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium"
+        style={{ background: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
+      >
         {slug}
       </span>
 
       {/* Name + description */}
       <div className="space-y-1">
-        <h3 className="text-base font-semibold leading-snug">{name}</h3>
-        <p className="text-sm text-neutral-500 leading-relaxed">{description}</p>
+        <h3 className="text-base font-semibold leading-snug" style={{ color: "var(--color-text-primary)" }}>
+          {name}
+        </h3>
+        <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+          {description}
+        </p>
       </div>
 
       {/* Blurred sample excerpt */}
-      <div className="relative overflow-hidden rounded-lg bg-neutral-50 px-4 pt-4 pb-0 dark:bg-neutral-900">
-        <p className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400 whitespace-pre-line select-none pointer-events-none">
+      <div
+        className="relative overflow-hidden px-4 pt-4 pb-0"
+        style={{ borderRadius: "var(--radius-md)", background: "var(--color-bg-subtle)" }}
+      >
+        <p
+          className="text-xs leading-relaxed whitespace-pre-line select-none pointer-events-none"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
           {excerpt}
         </p>
 
-        {/* Gradient fade — bottom two-thirds become unreadable */}
+        {/* Gradient fade */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-neutral-50 to-transparent dark:from-neutral-900"
+          className="absolute inset-x-0 bottom-0 h-28"
+          style={{ background: "linear-gradient(to top, var(--color-bg-subtle), transparent)" }}
         />
 
-        {/* Blur layer — sits on top of the gradient */}
+        {/* Blur layer */}
         <div
           aria-hidden="true"
           className="absolute inset-x-0 bottom-0 h-16 backdrop-blur-[2px]"
           style={{
             maskImage: "linear-gradient(to top, black 40%, transparent 100%)",
-            WebkitMaskImage:
-              "linear-gradient(to top, black 40%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to top, black 40%, transparent 100%)",
           }}
         />
 
         {/* "Sample preview" label */}
         <div className="relative z-10 flex justify-center py-3">
-          <span className="text-xs text-neutral-400 dark:text-neutral-600">
-            sample preview
-          </span>
+          <span className="text-xs" style={{ color: "var(--color-text-hint)" }}>sample preview</span>
         </div>
       </div>
     </div>

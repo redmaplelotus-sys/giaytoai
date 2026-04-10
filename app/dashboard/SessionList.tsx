@@ -10,7 +10,6 @@ import type { getUserSessions } from "@/lib/db/sessions";
 
 type SessionRow = Awaited<ReturnType<typeof getUserSessions>>[number];
 
-// Supabase returns nested one-to-many as arrays; one-to-one as object or null.
 type DocType  = { slug: string; name_en: string; name_vi: string };
 type DraftRow = { id: string; created_at: string };
 type ExportRow = { id: string; format: string; r2_key: string | null; created_at: string };
@@ -33,11 +32,11 @@ const DESTINATION_MAP: Record<string, { flag: string; name: string }> = {
   fr: { flag: "🇫🇷", name: "France"     },
 };
 
-const STATUS_STYLE: Record<string, string> = {
-  pending:    "bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400",
-  processing: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-  completed:  "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400",
-  failed:     "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400",
+const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
+  pending:    { bg: "var(--color-bg-subtle)",   color: "var(--color-text-muted)"     },
+  processing: { bg: "var(--color-blue-light)",  color: "var(--color-blue)"           },
+  completed:  { bg: "var(--color-green-light)", color: "var(--color-green)"          },
+  failed:     { bg: "var(--color-red-light)",   color: "var(--color-red)"            },
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -76,16 +75,11 @@ function ReDownloadButton({ exportId }: { exportId: string }) {
       onClick={handleClick}
       disabled={state === "loading"}
       title={state === "error" ? "Download failed — try again" : "Re-download file"}
-      className={[
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
-        "ring-1 ring-inset transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-        state === "error"
-          ? "bg-red-50 text-red-600 ring-red-200 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-800"
-          : "bg-white text-neutral-600 ring-neutral-200 hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 dark:ring-neutral-700 dark:hover:bg-neutral-800",
-      ].join(" ")}
+      className="btn-pill"
+      style={state === "error" ? { background: "var(--color-red-light)", color: "var(--color-red)", borderColor: "#F0B8B8" } : {}}
     >
       {state === "loading"
-        ? <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-neutral-400 border-t-transparent" />
+        ? <span className="inline-block h-3 w-3 animate-spin rounded-full border-2" style={{ borderColor: "var(--color-border-strong)", borderTopColor: "transparent" }} />
         : <span aria-hidden="true">⬇</span>
       }
       {state === "error" ? "Retry" : "Download"}
@@ -104,14 +98,14 @@ export interface SessionListProps {
 export function SessionList({ sessions }: SessionListProps) {
   if (sessions.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-neutral-200 dark:border-neutral-700 py-16 text-center">
-        <p className="text-sm text-neutral-400 dark:text-neutral-500">
+      <div
+        className="py-16 text-center rounded-xl"
+        style={{ border: "1.5px dashed var(--color-border-default)" }}
+      >
+        <p style={{ fontSize: 14, color: "var(--color-text-muted)" }}>
           You don&apos;t have any documents yet.
         </p>
-        <Link
-          href="/dashboard/new"
-          className="mt-4 inline-block rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-        >
+        <Link href="/dashboard/new" className="btn-primary" style={{ marginTop: 16, display: "inline-flex" }}>
           Create your first document
         </Link>
       </div>
@@ -119,9 +113,16 @@ export function SessionList({ sessions }: SessionListProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800">
+    <div className="card overflow-hidden">
       {/* Table header — hidden on mobile */}
-      <div className="hidden grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 px-4 py-2.5 text-xs font-medium uppercase tracking-wider text-neutral-400 sm:grid">
+      <div
+        className="hidden sm:grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 px-4 py-2.5 text-xs font-medium uppercase tracking-wider"
+        style={{
+          background: "var(--color-bg-subtle)",
+          borderBottom: "1px solid var(--color-border-default)",
+          color: "var(--color-text-muted)",
+        }}
+      >
         <span>Document</span>
         <span>Destination</span>
         <span>Date</span>
@@ -135,12 +136,10 @@ export function SessionList({ sessions }: SessionListProps) {
         const dest        = destCode ? DESTINATION_MAP[destCode] : null;
         const docType     = session.document_types as unknown as DocType | null;
 
-        // Latest draft → "Continue" link target
         const drafts      = (session.drafts as DraftRow[] | null) ?? [];
         const latestDraft = drafts.sort((a, b) =>
           b.created_at.localeCompare(a.created_at))[0] ?? null;
 
-        // Latest export with an r2_key → available for re-download
         const exports_    = (session.exports as ExportRow[] | null) ?? [];
         const latestExport = exports_
           .filter((e) => !!e.r2_key)
@@ -155,56 +154,51 @@ export function SessionList({ sessions }: SessionListProps) {
         });
 
         const status = session.status as string;
+        const statusStyle = STATUS_STYLE[status] ?? STATUS_STYLE.pending;
 
         return (
           <div
             key={session.id}
-            className={[
-              "grid grid-cols-1 gap-2 px-4 py-3 sm:grid-cols-[1fr_auto_auto_auto_auto] sm:items-center sm:gap-4",
-              i < sessions.length - 1
-                ? "border-b border-neutral-100 dark:border-neutral-800"
-                : "",
-            ].join(" ")}
+            className="grid grid-cols-1 gap-2 px-4 py-3 sm:grid-cols-[1fr_auto_auto_auto_auto] sm:items-center sm:gap-4"
+            style={i < sessions.length - 1 ? { borderBottom: "1px solid var(--color-border-subtle)" } : {}}
           >
             {/* Document type */}
             <div className="min-w-0">
               <Link
                 href={href}
-                className="block truncate text-sm font-medium text-neutral-900 dark:text-neutral-100 hover:underline"
+                className="block truncate text-sm font-medium hover:underline"
+                style={{ color: "var(--color-text-primary)" }}
               >
                 {docType?.name_en ?? "Document"}
               </Link>
             </div>
 
             {/* Destination */}
-            <div className="text-sm text-neutral-500 dark:text-neutral-400 sm:whitespace-nowrap">
+            <div className="text-sm sm:whitespace-nowrap" style={{ color: "var(--color-text-secondary)" }}>
               {dest
                 ? <span>{dest.flag} {dest.name}</span>
-                : <span className="text-neutral-300 dark:text-neutral-600">—</span>
+                : <span style={{ color: "var(--color-text-hint)" }}>—</span>
               }
             </div>
 
             {/* Date */}
-            <div className="text-xs text-neutral-400 dark:text-neutral-500 sm:whitespace-nowrap">
+            <div className="text-xs sm:whitespace-nowrap" style={{ color: "var(--color-text-muted)" }}>
               {date}
             </div>
 
             {/* Status badge */}
             <div>
-              <span className={[
-                "inline-block rounded-full px-2 py-0.5 text-xs font-medium",
-                STATUS_STYLE[status] ?? STATUS_STYLE.pending,
-              ].join(" ")}>
+              <span
+                className="inline-block rounded-full px-2 py-0.5 text-xs font-medium"
+                style={{ background: statusStyle.bg, color: statusStyle.color }}
+              >
                 {STATUS_LABEL[status] ?? status}
               </span>
             </div>
 
             {/* Actions */}
             <div className="flex items-center gap-2">
-              <Link
-                href={href}
-                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ring-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 dark:ring-neutral-700 dark:hover:bg-neutral-800 transition-colors"
-              >
+              <Link href={href} className="btn-pill">
                 {latestDraft ? "Open" : "Continue"}
               </Link>
               {latestExport && (

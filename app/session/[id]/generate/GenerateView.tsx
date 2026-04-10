@@ -22,7 +22,6 @@ interface DraftRevision {
   quality: QualityReport | null;
 }
 
-
 // ---------------------------------------------------------------------------
 // Revision tabs  (v1 · v2 · v3 …)
 // ---------------------------------------------------------------------------
@@ -47,16 +46,15 @@ function RevisionTabs({ revisions, activeIndex, onSelect, streaming }: RevisionT
             key={rev.id}
             type="button"
             onClick={() => onSelect(i)}
-            className={[
-              "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-              isActive
-                ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700",
-            ].join(" ")}
+            className={`btn-pill ${isActive ? "btn-pill-active" : ""}`}
+            style={{ padding: "4px 10px", fontSize: 11 }}
           >
             v{i + 1}
             {isLoading && (
-              <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+              <span
+                className="ml-1 inline-block h-1.5 w-1.5 rounded-full animate-pulse"
+                style={{ background: "var(--color-blue)" }}
+              />
             )}
           </button>
         );
@@ -69,12 +67,16 @@ function RevisionTabs({ revisions, activeIndex, onSelect, streaming }: RevisionT
 // Phase dot
 // ---------------------------------------------------------------------------
 
-const PHASE_DOT: Record<GeneratePhase, string> = {
-  idle:       "bg-neutral-300 dark:bg-neutral-600",
-  connecting: "bg-amber-400 animate-pulse",
-  streaming:  "bg-blue-500 animate-pulse",
-  complete:   "bg-green-500",
-  error:      "bg-red-500",
+const PHASE_DOT_COLOR: Record<GeneratePhase, string> = {
+  idle:       "var(--color-border-strong)",
+  connecting: "var(--color-amber)",
+  streaming:  "var(--color-blue)",
+  complete:   "var(--color-green)",
+  error:      "var(--color-red)",
+};
+
+const PHASE_DOT_PULSE: Record<GeneratePhase, boolean> = {
+  idle: false, connecting: true, streaming: true, complete: false, error: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -93,7 +95,6 @@ function TranslationPanel({ sessionId, draftText, draftId, onTranslated }: Trans
   const [translation, setTranslation] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  // Cache by draft id so switching revisions refetches automatically
   const cacheRef = useRef<Map<string, string>>(new Map());
 
   useEffect(() => {
@@ -128,21 +129,30 @@ function TranslationPanel({ sessionId, draftText, draftId, onTranslated }: Trans
   }, [sessionId, draftText, draftId]);
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900">
-      <div className="flex items-center gap-2 border-b border-neutral-200 px-4 py-2.5 dark:border-neutral-700">
-        <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+    <div
+      style={{
+        borderRadius: "var(--radius-lg)",
+        border: "1px solid var(--color-border-default)",
+        background: "var(--color-bg-subtle)",
+      }}
+    >
+      <div
+        className="flex items-center gap-2 px-4 py-2.5"
+        style={{ borderBottom: "1px solid var(--color-border-default)" }}
+      >
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>
           🇻🇳 Tiếng Việt
         </span>
       </div>
       <div className="px-4 py-3">
         {loading && (
-          <p className="text-sm text-neutral-400 animate-pulse">{t("translating")}</p>
+          <p className="text-sm animate-pulse" style={{ color: "var(--color-text-muted)" }}>{t("translating")}</p>
         )}
         {error && (
-          <p className="text-sm text-red-500">{t("translateError")}</p>
+          <p className="text-sm" style={{ color: "var(--color-red)" }}>{t("translateError")}</p>
         )}
         {translation && (
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+          <p className="whitespace-pre-wrap text-sm leading-relaxed" style={{ color: "var(--color-text-body)" }}>
             {translation}
           </p>
         )}
@@ -158,17 +168,13 @@ function TranslationPanel({ sessionId, draftText, draftId, onTranslated }: Trans
 export function GenerateView({ sessionId, targetWordCount }: { sessionId: string; targetWordCount?: number | null }) {
   const t = useT("generation");
 
-  // ── Revision history ──────────────────────────────────────────────────────
-  const [revisions, setRevisions]       = useState<DraftRevision[]>([]);
-  const [activeIndex, setActiveIndex]   = useState(0);
+  const [revisions, setRevisions]         = useState<DraftRevision[]>([]);
+  const [activeIndex, setActiveIndex]     = useState(0);
   const [historyLoaded, setHistoryLoaded] = useState(false);
 
-  // ── Translation panel ─────────────────────────────────────────────────────
   const [showTranslation, setShowTranslation] = useState(false);
-  // Lifted from TranslationPanel so DocumentToolbar can offer bilingual export
   const [translationText, setTranslationText] = useState<string | null>(null);
 
-  // ── Tiptap editor ─────────────────────────────────────────────────────────
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -177,7 +183,7 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
     editorProps: {
       attributes: {
         class:
-          "prose prose-neutral dark:prose-invert max-w-none min-h-[24rem] " +
+          "prose prose-neutral max-w-none min-h-[24rem] " +
           "focus:outline-none px-4 py-3 text-sm leading-relaxed",
       },
     },
@@ -189,7 +195,6 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
   const { phase, safety, quality, timing, error, draftId, inputTokens, outputTokens } = state;
   const isStreaming = phase === "connecting" || phase === "streaming";
 
-  // ── Save current editor content as a new manual revision ─────────────────
   const [saving, setSaving] = useState(false);
   const saveVersion = useCallback(async () => {
     if (!editor || saving) return;
@@ -216,7 +221,6 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
     }
   }, [editor, sessionId, saving]);
 
-  // ── Load existing drafts on mount ─────────────────────────────────────────
   useEffect(() => {
     fetch(`/api/sessions/${sessionId}/drafts`)
       .then((r) => r.json())
@@ -236,7 +240,6 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
       .catch(() => setHistoryLoaded(true));
   }, [sessionId]);
 
-  // ── Auto-start generation when history is loaded and there are no drafts ──
   const hasAutoStarted = useRef(false);
   useEffect(() => {
     if (!historyLoaded || !editor || hasAutoStarted.current) return;
@@ -244,12 +247,10 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
       hasAutoStarted.current = true;
       generate(`/api/sessions/${sessionId}/generate`);
     } else {
-      // Populate editor with the latest revision
       editor.commands.setContent(revisions[revisions.length - 1].text);
     }
   }, [historyLoaded, editor, revisions, sessionId, generate]);
 
-  // ── When a new generation completes, append to revision list ─────────────
   useEffect(() => {
     if (phase !== "complete" || !draftId) return;
     const text = editor?.getText() ?? "";
@@ -269,7 +270,6 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, draftId]);
 
-  // ── Switching revisions loads that revision into the editor ───────────────
   const handleSelectRevision = useCallback((index: number) => {
     if (isStreaming) return;
     setActiveIndex(index);
@@ -279,22 +279,23 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
     }
   }, [revisions, editor, isStreaming]);
 
-  // ── Active revision metadata ──────────────────────────────────────────────
   const activeRevision = revisions[activeIndex] ?? null;
   const activeQuality  = phase === "complete" && activeIndex === revisions.length - 1
-    ? quality                    // fresh quality from last stream
-    : activeRevision?.quality;   // stored quality for older revisions
+    ? quality
+    : activeRevision?.quality;
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="mx-auto max-w-2xl space-y-4 px-4 py-10">
+    <div className="page-container space-y-4 py-10">
 
       {/* ── Top toolbar ── */}
       <div className="flex items-center justify-between gap-3">
 
         {/* Left: phase indicator + version tabs */}
         <div className="flex items-center gap-3 min-w-0">
-          <span className={`shrink-0 inline-block h-2 w-2 rounded-full ${PHASE_DOT[phase]}`} />
+          <span
+            className={`shrink-0 inline-block h-2 w-2 rounded-full ${PHASE_DOT_PULSE[phase] ? "animate-pulse" : ""}`}
+            style={{ background: PHASE_DOT_COLOR[phase] }}
+          />
           <RevisionTabs
             revisions={revisions}
             activeIndex={activeIndex}
@@ -302,22 +303,24 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
             streaming={isStreaming}
           />
           {revisions.length === 0 && isStreaming && (
-            <span className="text-sm font-medium text-neutral-500 truncate">
+            <span className="text-sm font-medium truncate" style={{ color: "var(--color-text-secondary)" }}>
               {t("heading")}
             </span>
           )}
           {phase === "complete" && (
-            <span className="text-sm font-medium truncate">{t("done")}</span>
+            <span className="text-sm font-medium truncate" style={{ color: "var(--color-text-primary)" }}>
+              {t("done")}
+            </span>
           )}
           {phase === "error" && (
-            <span className="text-sm text-red-500 truncate">{error}</span>
+            <span className="text-sm truncate" style={{ color: "var(--color-red)" }}>{error}</span>
           )}
         </div>
 
         {/* Right: timing + actions */}
         <div className="flex shrink-0 items-center gap-3">
           {timing.firstTokenMs !== null && (
-            <span className="hidden sm:inline text-xs text-neutral-400 tabular-nums">
+            <span className="hidden sm:inline text-xs tabular-nums" style={{ color: "var(--color-text-hint)" }}>
               {t("ttft")}{" "}
               {timing.firstTokenMs < 1000
                 ? `${timing.firstTokenMs}ms`
@@ -325,7 +328,7 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
             </span>
           )}
           {timing.totalMs !== null && phase === "complete" && (
-            <span className="hidden sm:inline text-xs text-neutral-400 tabular-nums">
+            <span className="hidden sm:inline text-xs tabular-nums" style={{ color: "var(--color-text-hint)" }}>
               {t("totalTime")}{" "}
               {timing.totalMs < 1000
                 ? `${timing.totalMs}ms`
@@ -334,11 +337,7 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
           )}
 
           {isStreaming ? (
-            <button
-              type="button"
-              onClick={abort}
-              className="text-xs text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-            >
+            <button type="button" onClick={abort} className="btn-ghost" style={{ fontSize: 12 }}>
               {t("abort")}
             </button>
           ) : revisions.length === 0 ? (
@@ -346,9 +345,8 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
               type="button"
               onClick={() => generate(`/api/sessions/${sessionId}/generate`)}
               disabled={!historyLoaded}
-              className="rounded-full bg-neutral-900 px-3 py-1 text-xs font-semibold text-white
-                         hover:bg-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed
-                         dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+              className="btn-primary"
+              style={{ padding: "6px 14px", fontSize: 12 }}
             >
               {t("heading")}
             </button>
@@ -358,17 +356,16 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
                 type="button"
                 onClick={saveVersion}
                 disabled={saving}
-                className="rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-neutral-200
-                           text-neutral-600 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed
-                           dark:ring-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                className="btn-secondary"
+                style={{ padding: "6px 14px", fontSize: 12 }}
               >
                 {saving ? t("saving") : t("saveVersion")}
               </button>
               <button
                 type="button"
                 onClick={() => generate(`/api/sessions/${sessionId}/generate`)}
-                className="rounded-full bg-neutral-900 px-3 py-1 text-xs font-semibold text-white
-                           hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+                className="btn-primary"
+                style={{ padding: "6px 14px", fontSize: 12 }}
               >
                 {t("newVersion")}
               </button>
@@ -379,31 +376,41 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
 
       {/* ── Safety warning ── */}
       {safety && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-900/20">
-          <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+        <div
+          className="px-4 py-3"
+          style={{
+            borderRadius: "var(--radius-md)",
+            border: "1px solid #E8C88A",
+            background: "var(--color-amber-light)",
+          }}
+        >
+          <p className="text-sm font-medium" style={{ color: "var(--color-amber)" }}>
             {t("revisePrompt")}
           </p>
           {safety.reason && (
-            <p className="mt-1 text-xs text-amber-600 dark:text-amber-500">{safety.reason}</p>
+            <p className="mt-1 text-xs" style={{ color: "var(--color-amber)" }}>{safety.reason}</p>
           )}
         </div>
       )}
 
       {/* ── Editor ── */}
       <div
-        className={[
-          "rounded-xl border bg-white transition-colors dark:bg-neutral-900",
-          isStreaming
-            ? "border-blue-200 dark:border-blue-800"
-            : phase === "error"
-              ? "border-red-200 dark:border-red-800"
-              : "border-neutral-200 dark:border-neutral-700",
-        ].join(" ")}
+        style={{
+          borderRadius: "var(--radius-lg)",
+          border: `1px solid ${
+            isStreaming ? "var(--color-blue)"
+            : phase === "error" ? "var(--color-red)"
+            : "var(--color-border-default)"
+          }`,
+          background: "var(--color-bg-surface)",
+          boxShadow: "var(--shadow-card)",
+          transition: "border-color 0.2s",
+        }}
       >
         <EditorContent editor={editor} />
       </div>
 
-      {/* ── Document toolbar: word count, progress, translate, export ── */}
+      {/* ── Document toolbar ── */}
       {activeRevision && !isStreaming && (
         <DocumentToolbar
           editor={editor}
@@ -430,7 +437,7 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
         />
       )}
 
-      {/* ── Quality badges — polls until populated, seeds from SSE if available ── */}
+      {/* ── Quality badges ── */}
       {activeRevision && !isStreaming && (
         <PollingQualityBadges
           draftId={activeRevision.id}
@@ -443,7 +450,7 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
 
       {/* ── Footer ── */}
       {(phase === "complete" || revisions.length > 0) && !isStreaming && (
-        <p className="text-center text-xs text-neutral-400">
+        <p className="text-center text-xs" style={{ color: "var(--color-text-hint)" }}>
           {phase === "complete" && <>{t("creditsUsed")} · </>}
           {inputTokens !== null && outputTokens !== null && phase === "complete" && (
             <>{((inputTokens + outputTokens) / 1000).toFixed(1)}k tokens · </>

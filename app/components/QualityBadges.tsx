@@ -21,16 +21,6 @@ function wordCountColor(status: QualityReport["wordCountStatus"]["status"]): Pal
   return "amber"; // over | under
 }
 
-const PILL_BASE =
-  "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset";
-
-const PILL_PALETTE: Record<Palette, string> = {
-  green:   "bg-green-50 text-green-700 ring-green-200 dark:bg-green-900/20 dark:text-green-300 dark:ring-green-700",
-  amber:   "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:ring-amber-700",
-  red:     "bg-red-50   text-red-700   ring-red-200   dark:bg-red-900/20   dark:text-red-300   dark:ring-red-700",
-  neutral: "bg-neutral-100 text-neutral-600 ring-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:ring-neutral-700",
-};
-
 function Pill({
   color,
   icon,
@@ -43,10 +33,7 @@ function Pill({
   title?: string;
 }) {
   return (
-    <span
-      className={`${PILL_BASE} ${PILL_PALETTE[color]}`}
-      title={title}
-    >
+    <span className={`badge badge-${color}`} title={title}>
       <span aria-hidden="true">{icon}</span>
       {label}
     </span>
@@ -59,7 +46,8 @@ function Pill({
 function SkeletonPill() {
   return (
     <span
-      className={`${PILL_BASE} ${PILL_PALETTE.neutral} animate-pulse w-24`}
+      className="badge badge-neutral animate-pulse"
+      style={{ width: 80 }}
       aria-hidden="true"
     >
       &nbsp;
@@ -127,7 +115,7 @@ function WarningList({ items }: { items: string[] }) {
   return (
     <ul className="mt-2 space-y-1">
       {items.map((w, i) => (
-        <li key={i} className="flex items-start gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+        <li key={i} className="flex items-start gap-1.5 text-xs" style={{ color: "var(--color-amber)" }}>
           <span className="mt-px shrink-0" aria-hidden="true">⚠</span>
           <span>{w}</span>
         </li>
@@ -141,7 +129,7 @@ function StrengthList({ items }: { items: string[] }) {
   return (
     <ul className="mt-2 space-y-1">
       {items.map((s, i) => (
-        <li key={i} className="flex items-start gap-1.5 text-xs text-green-600 dark:text-green-400">
+        <li key={i} className="flex items-start gap-1.5 text-xs" style={{ color: "var(--color-green)" }}>
           <span className="mt-px shrink-0" aria-hidden="true">✓</span>
           <span>{s}</span>
         </li>
@@ -152,7 +140,6 @@ function StrengthList({ items }: { items: string[] }) {
 
 interface QualityBadgeRowProps {
   quality: QualityReport;
-  /** When true, renders warnings and strengths below the pills */
   showDetail?: boolean;
 }
 
@@ -165,7 +152,7 @@ export function QualityBadgeRow({ quality, showDetail = false }: QualityBadgeRow
         <FitBadge    quality={quality} />
       </div>
       {quality.toneNote && (
-        <p className="text-xs italic text-neutral-500 dark:text-neutral-400">
+        <p className="text-xs italic" style={{ color: "var(--color-text-muted)" }}>
           {quality.toneNote}
         </p>
       )}
@@ -181,12 +168,6 @@ export function QualityBadgeRow({ quality, showDetail = false }: QualityBadgeRow
 
 // ---------------------------------------------------------------------------
 // PollingQualityBadges
-//
-// Drop-in component: pass a draftId and optionally seed with quality from
-// the SSE stream. Shows skeleton pills while polling, then the real badges.
-//
-// Usage:
-//   <PollingQualityBadges draftId={draftId} initialQuality={streamQuality} />
 // ---------------------------------------------------------------------------
 
 interface PollingQualityBadgesProps {
@@ -206,7 +187,14 @@ export function PollingQualityBadges({
 
   if (qs.status === "ready") {
     return (
-      <div className="rounded-xl border border-neutral-100 bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
+      <div
+        className="p-4"
+        style={{
+          borderRadius: "var(--radius-lg)",
+          border: "1px solid var(--color-border-default)",
+          background: "var(--color-bg-subtle)",
+        }}
+      >
         <QualityBadgeRow quality={qs.quality} showDetail={showDetail} />
       </div>
     );
@@ -214,7 +202,14 @@ export function PollingQualityBadges({
 
   if (qs.status === "polling") {
     return (
-      <div className="rounded-xl border border-neutral-100 bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
+      <div
+        className="p-4"
+        style={{
+          borderRadius: "var(--radius-lg)",
+          border: "1px solid var(--color-border-default)",
+          background: "var(--color-bg-subtle)",
+        }}
+      >
         <div className="flex flex-wrap gap-2">
           <SkeletonPill />
           <SkeletonPill />
@@ -224,6 +219,5 @@ export function PollingQualityBadges({
     );
   }
 
-  // timeout or error — silently collapse (quality is non-critical)
   return null;
 }

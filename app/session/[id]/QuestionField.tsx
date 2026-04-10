@@ -2,47 +2,31 @@
 
 import type { AnswerSource } from "@/lib/session/answers";
 
-// ---------------------------------------------------------------------------
-// Re-export so existing imports of FieldSource keep working during migration.
-// Prefer importing AnswerSource directly from @/lib/session/answers.
-// ---------------------------------------------------------------------------
-
 /** @deprecated Use AnswerSource from @/lib/session/answers */
 export type FieldSource = AnswerSource;
 
-const BADGE: Record<
-  AnswerSource,
-  { label: string; icon: string; className: string }
-> = {
+const BADGE_META: Record<AnswerSource, { label: string; icon: string; cls: string }> = {
   missing: {
     icon: "○",
     label: "Required",
-    className: "text-neutral-400 dark:text-neutral-500",
+    cls: "source-missing",
   },
   extracted: {
     icon: "◈",
-    label: "Review",
-    className:
-      "rounded-full bg-amber-50 px-1.5 py-0.5 text-amber-600 ring-1 ring-amber-200 " +
-      "dark:bg-amber-900/20 dark:text-amber-400 dark:ring-amber-800",
+    label: "Extracted",
+    cls: "source-extracted",
   },
   user: {
     icon: "✓",
     label: "Saved",
-    className:
-      "rounded-full bg-green-50 px-1.5 py-0.5 text-green-700 ring-1 ring-green-200 " +
-      "dark:bg-green-900/20 dark:text-green-400 dark:ring-green-800",
+    cls: "source-user",
   },
 };
 
-function SourceBadge({ source }: { source: FieldSource }) {
-  const { icon, label, className } = BADGE[source];
+function SourceBadge({ source }: { source: AnswerSource }) {
+  const { icon, label, cls } = BADGE_META[source];
   return (
-    <span
-      aria-label={label}
-      title={label}
-      className={`inline-flex shrink-0 items-center gap-0.5 text-xs font-medium leading-none select-none ${className}`}
-    >
+    <span aria-label={label} title={label} className={`source-badge ${cls}`}>
       <span aria-hidden="true">{icon}</span>
       <span>{label}</span>
     </span>
@@ -50,30 +34,24 @@ function SourceBadge({ source }: { source: FieldSource }) {
 }
 
 // ---------------------------------------------------------------------------
-// Border and ring by source
+// Input modifier class by source
 // ---------------------------------------------------------------------------
 
-const BORDER: Record<AnswerSource, string> = {
-  missing:   "border-red-200   dark:border-red-900",
-  extracted: "border-amber-300 dark:border-amber-700",
-  user:      "border-green-300 dark:border-green-700",
-};
-
-const FOCUS_RING: Record<AnswerSource, string> = {
-  missing:   "focus:border-red-400   focus:ring-red-400   dark:focus:border-red-600   dark:focus:ring-red-600",
-  extracted: "focus:border-amber-500 focus:ring-amber-500 dark:focus:border-amber-500 dark:focus:ring-amber-500",
-  user:      "focus:border-green-500 focus:ring-green-500 dark:focus:border-green-500 dark:focus:ring-green-500",
+const INPUT_SOURCE_CLASS: Record<AnswerSource, string> = {
+  missing:   "input-field-missing",
+  extracted: "input-field-extracted",
+  user:      "input-field-user",
 };
 
 // ---------------------------------------------------------------------------
 // Char count display
 // ---------------------------------------------------------------------------
 
-const COUNT_COLOR = (n: number): string => {
-  if (n === 0) return "text-neutral-300 dark:text-neutral-600";
-  if (n < 50)  return "text-amber-500";
-  return "text-neutral-400 dark:text-neutral-500";
-};
+function charCountColor(n: number): string {
+  if (n === 0) return "var(--color-text-hint)";
+  if (n < 50)  return "var(--color-amber)";
+  return "var(--color-text-muted)";
+}
 
 // ---------------------------------------------------------------------------
 // Component
@@ -102,15 +80,7 @@ export function QuestionField({
   onChange,
   onBlur,
 }: QuestionFieldProps) {
-  const border = BORDER[source];
-  const focusRing = FOCUS_RING[source];
-
-  const baseClass =
-    "w-full rounded-lg border bg-white px-3 py-2 text-sm " +
-    "placeholder-neutral-300 transition-colors " +
-    "focus:outline-none focus:ring-1 " +
-    "dark:bg-neutral-900 dark:placeholder-neutral-600 " +
-    `${border} ${focusRing}`;
+  const inputClass = `input-field ${INPUT_SOURCE_CLASS[source]}`;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -120,7 +90,7 @@ export function QuestionField({
     <div className="space-y-1.5">
       {/* Label row */}
       <div className="flex items-center justify-between gap-3">
-        <label htmlFor={id} className="text-sm font-medium leading-none">
+        <label htmlFor={id} className="text-sm font-medium leading-none" style={{ color: "var(--color-text-primary)" }}>
           {label}
         </label>
         <SourceBadge source={source} />
@@ -128,7 +98,7 @@ export function QuestionField({
 
       {/* Hint */}
       {hint && (
-        <p className="text-xs leading-snug text-neutral-400">{hint}</p>
+        <p className="text-xs leading-snug" style={{ color: "var(--color-text-muted)" }}>{hint}</p>
       )}
 
       {/* Input */}
@@ -140,9 +110,12 @@ export function QuestionField({
             rows={rows}
             onChange={handleChange}
             onBlur={onBlur}
-            className={`${baseClass} resize-y`}
+            className={`${inputClass} resize-y`}
           />
-          <p className={`text-right text-xs tabular-nums ${COUNT_COLOR(value.length)}`}>
+          <p
+            className="text-right text-xs tabular-nums"
+            style={{ color: charCountColor(value.length) }}
+          >
             {value.length.toLocaleString()} chars
           </p>
         </>
@@ -154,7 +127,8 @@ export function QuestionField({
           value={value}
           onChange={handleChange}
           onBlur={onBlur}
-          className={baseClass.replace("w-full", "w-36")}
+          className={inputClass}
+          style={{ width: 144 }}
         />
       ) : (
         <input
@@ -163,7 +137,7 @@ export function QuestionField({
           value={value}
           onChange={handleChange}
           onBlur={onBlur}
-          className={baseClass}
+          className={inputClass}
         />
       )}
     </div>

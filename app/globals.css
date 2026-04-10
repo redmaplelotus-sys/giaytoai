@@ -1,26 +1,260 @@
 @import "tailwindcss";
 
+/* ── Design tokens ─────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg-page:        #FAFAFA;
+  --color-bg-surface:     #FFFFFF;
+  --color-bg-subtle:      #F5F4F0;
+  --color-bg-hover:       #F1EFE8;
+
+  --color-border-default: #E8E8E4;
+  --color-border-subtle:  #F1EFE8;
+  --color-border-strong:  #D3D1C7;
+
+  --color-text-primary:   #1B3A5C;
+  --color-text-body:      #444441;
+  --color-text-secondary: #5F5E5A;
+  --color-text-muted:     #888780;
+  --color-text-hint:      #B4B2A9;
+
+  --color-navy:           #1B3A5C;
+  --color-navy-hover:     #185FA5;
+  --color-blue:           #185FA5;
+  --color-blue-light:     #E6F1FB;
+  --color-blue-dark:      #0C447C;
+  --color-teal:           #0F6E56;
+  --color-teal-light:     #E1F5EE;
+  --color-green:          #3B6D11;
+  --color-green-light:    #EAF3DE;
+  --color-amber:          #854F0B;
+  --color-amber-light:    #FAEEDA;
+  --color-red:            #A32D2D;
+  --color-red-light:      #FCEBEB;
+
+  --radius-sm:            6px;
+  --radius-md:            8px;
+  --radius-lg:            12px;
+  --radius-xl:            16px;
+
+  --shadow-card:          0 1px 3px rgba(0,0,0,0.06);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--color-bg-page);
+  --color-foreground: var(--color-text-body);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: var(--color-bg-page);
+  color: var(--color-text-body);
+  font-family: inherit;
+  line-height: 1.6;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Page layout ────────────────────────────────────────────────────── */
+.page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-left: 32px;
+  padding-right: 32px;
 }
+@media (max-width: 640px) {
+  .page-container { padding-left: 20px; padding-right: 20px; }
+}
+
+/* ── App header ─────────────────────────────────────────────────────── */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 56px;
+  background: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.app-header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+@media (max-width: 640px) {
+  .app-header-inner { padding: 0 20px; }
+}
+
+/* ── Cards ──────────────────────────────────────────────────────────── */
+.card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+/* ── Primary button ─────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--color-navy);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary:hover:not(:disabled) { background: var(--color-navy-hover); }
+.btn-primary:disabled              { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Secondary / outline button ─────────────────────────────────────── */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #ffffff;
+  color: var(--color-navy);
+  border: 1.5px solid var(--color-navy);
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-secondary:hover:not(:disabled) { background: var(--color-blue-light); }
+.btn-secondary:disabled              { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Ghost button ───────────────────────────────────────────────────── */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+.btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Pill button (small, used in toolbars) ──────────────────────────── */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-pill:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+.btn-pill:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-pill-active {
+  background: var(--color-navy) !important;
+  color: #ffffff !important;
+  border-color: var(--color-navy) !important;
+}
+.btn-pill-active:hover:not(:disabled) {
+  background: var(--color-navy-hover) !important;
+  border-color: var(--color-navy-hover) !important;
+}
+
+/* ── Input field ────────────────────────────────────────────────────── */
+.input-field {
+  background: #ffffff;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  color: var(--color-text-body);
+  padding: 8px 12px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+.input-field::placeholder { color: var(--color-text-hint); }
+.input-field:focus {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px rgba(24,95,165,0.1);
+}
+.input-field-missing  { border-color: var(--color-red);   }
+.input-field-missing:focus  {
+  border-color: var(--color-red);
+  box-shadow: 0 0 0 3px rgba(163,45,45,0.1);
+}
+.input-field-extracted { border-color: #C0DD97; }
+.input-field-extracted:focus {
+  border-color: var(--color-green);
+  box-shadow: 0 0 0 3px rgba(59,109,17,0.1);
+}
+.input-field-user  { border-color: #E8C88A; }
+.input-field-user:focus {
+  border-color: var(--color-amber);
+  box-shadow: 0 0 0 3px rgba(133,79,11,0.1);
+}
+
+/* ── Quality / scoring badges ───────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+}
+.badge-green   { background: var(--color-green-light); color: var(--color-green); border: 1px solid #C0DD97; }
+.badge-amber   { background: var(--color-amber-light); color: var(--color-amber); border: 1px solid #E8C88A; }
+.badge-red     { background: var(--color-red-light);   color: var(--color-red);   border: 1px solid #F0B8B8; }
+.badge-neutral { background: var(--color-bg-subtle);   color: var(--color-text-secondary); border: 1px solid var(--color-border-default); }
+
+/* ── Answer-source badges (interview form) ──────────────────────────── */
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  user-select: none;
+  white-space: nowrap;
+}
+.source-extracted { background: var(--color-green-light); color: var(--color-green); border: 1px solid #C0DD97; }
+.source-user      { background: var(--color-amber-light); color: var(--color-amber); }
+.source-missing   { background: var(--color-red-light);   color: var(--color-red);   }

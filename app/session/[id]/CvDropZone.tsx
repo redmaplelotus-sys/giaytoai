@@ -28,13 +28,13 @@ function ProgressRing({ pct }: { pct: number }) {
   const dash = circ * (pct / 100);
   return (
     <svg width={44} height={44} className="-rotate-90">
-      <circle cx={22} cy={22} r={r} fill="none" stroke="currentColor" strokeWidth={3} className="text-neutral-200 dark:text-neutral-700" />
+      <circle cx={22} cy={22} r={r} fill="none" stroke="var(--color-border-default)" strokeWidth={3} />
       <circle
         cx={22} cy={22} r={r} fill="none"
-        stroke="currentColor" strokeWidth={3}
+        stroke="var(--color-navy)" strokeWidth={3}
         strokeDasharray={`${dash} ${circ}`}
         strokeLinecap="round"
-        className="text-neutral-900 dark:text-white transition-all duration-150"
+        style={{ transition: "stroke-dasharray 0.15s" }}
       />
     </svg>
   );
@@ -144,11 +144,18 @@ export function CvDropZone({ sessionId, onExtracted }: CvDropZoneProps) {
   // ── Uploading ──
   if (phase === "uploading") {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-700 dark:bg-neutral-900">
+      <div
+        className="flex flex-col items-center gap-3 p-6"
+        style={{
+          borderRadius: "var(--radius-lg)",
+          border: "1px solid var(--color-border-default)",
+          background: "var(--color-bg-subtle)",
+        }}
+      >
         <ProgressRing pct={state.progress} />
-        <p className="text-sm font-medium">{t("uploading")}</p>
-        <p className="tabular-nums text-xs text-neutral-400">{state.progress}%</p>
-        <button type="button" onClick={reset} className="text-xs text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200">
+        <p className="text-sm font-medium" style={{ color: "var(--color-text-body)" }}>{t("uploading")}</p>
+        <p className="tabular-nums text-xs" style={{ color: "var(--color-text-muted)" }}>{state.progress}%</p>
+        <button type="button" onClick={reset} className="btn-ghost" style={{ fontSize: 12 }}>
           Cancel
         </button>
       </div>
@@ -158,9 +165,16 @@ export function CvDropZone({ sessionId, onExtracted }: CvDropZoneProps) {
   // ── Extracting ──
   if (phase === "extracting") {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-700 dark:bg-neutral-900">
+      <div
+        className="flex flex-col items-center gap-3 p-6"
+        style={{
+          borderRadius: "var(--radius-lg)",
+          border: "1px solid var(--color-border-default)",
+          background: "var(--color-bg-subtle)",
+        }}
+      >
         <span className="animate-spin text-2xl" aria-hidden="true">⟳</span>
-        <p className="text-sm font-medium">{t("extracting")}</p>
+        <p className="text-sm font-medium" style={{ color: "var(--color-text-body)" }}>{t("extracting")}</p>
       </div>
     );
   }
@@ -168,11 +182,18 @@ export function CvDropZone({ sessionId, onExtracted }: CvDropZoneProps) {
   // ── Done ──
   if (phase === "done") {
     return (
-      <div className="flex items-center justify-between rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-900/20">
-        <p className="text-sm font-medium text-green-700 dark:text-green-400">
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{
+          borderRadius: "var(--radius-lg)",
+          border: "1px solid #C0DD97",
+          background: "var(--color-green-light)",
+        }}
+      >
+        <p className="text-sm font-medium" style={{ color: "var(--color-green)" }}>
           ✓ {t("done", { count: state.count })}
         </p>
-        <button type="button" onClick={reset} className="text-xs text-green-600 hover:text-green-800 dark:text-green-500 dark:hover:text-green-300">
+        <button type="button" onClick={reset} className="btn-ghost" style={{ fontSize: 12, color: "var(--color-green)" }}>
           {t("retry")}
         </button>
       </div>
@@ -186,9 +207,16 @@ export function CvDropZone({ sessionId, onExtracted }: CvDropZoneProps) {
       : state.code === "read"   ? t("errorRead")
       : t("errorGeneric");
     return (
-      <div className="flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-900/20">
-        <p className="text-sm text-red-600 dark:text-red-400">{msg}</p>
-        <button type="button" onClick={reset} className="text-xs font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200">
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{
+          borderRadius: "var(--radius-lg)",
+          border: "1px solid #F0B8B8",
+          background: "var(--color-red-light)",
+        }}
+      >
+        <p className="text-sm" style={{ color: "var(--color-red)" }}>{msg}</p>
+        <button type="button" onClick={reset} className="btn-ghost" style={{ fontSize: 12, color: "var(--color-red)" }}>
           {t("retry")}
         </button>
       </div>
@@ -206,23 +234,22 @@ export function CvDropZone({ sessionId, onExtracted }: CvDropZoneProps) {
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") inputRef.current?.click(); }}
-      className={[
-        "flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed px-6 py-8",
-        "transition-colors focus-visible:outline-none focus-visible:ring-2",
-        dragging
-          ? "border-neutral-900 bg-neutral-50 dark:border-white dark:bg-neutral-800"
-          : "border-neutral-200 hover:border-neutral-400 dark:border-neutral-700 dark:hover:border-neutral-500",
-      ].join(" ")}
+      className="flex cursor-pointer flex-col items-center gap-2 px-6 py-8 transition-colors focus-visible:outline-none focus-visible:ring-2"
+      style={{
+        borderRadius: "var(--radius-lg)",
+        border: `2px dashed ${dragging ? "var(--color-navy)" : "var(--color-border-default)"}`,
+        background: dragging ? "var(--color-blue-light)" : "var(--color-bg-surface)",
+      }}
     >
       <span className="text-2xl leading-none" aria-hidden="true">
         {dragging ? "⬇" : "📄"}
       </span>
-      <p className="text-sm font-medium">
+      <p className="text-sm font-medium" style={{ color: "var(--color-text-body)" }}>
         {dragging ? t("dropActive") : t("dropIdle")}
       </p>
-      <p className="text-xs text-neutral-400">
+      <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
         {t("hint")}{" "}
-        <span className="font-medium text-neutral-600 underline dark:text-neutral-300">
+        <span style={{ fontWeight: 500, color: "var(--color-blue)", textDecoration: "underline" }}>
           {t("browse")}
         </span>
       </p>

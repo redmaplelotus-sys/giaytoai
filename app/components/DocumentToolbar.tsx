@@ -23,7 +23,6 @@ interface DocumentToolbarProps {
   targetWordCount?:    number | null;
   showTranslation:     boolean;
   onToggleTranslation: () => void;
-  /** Vietnamese translation text — when provided, enables bilingual export. */
   vietnameseText?:     string | null;
 }
 
@@ -47,13 +46,13 @@ interface ProgressBarProps {
 function ProgressBar({ current, target }: ProgressBarProps) {
   const pct = Math.min(100, Math.round((current / target) * 100));
 
-  let color: string;
+  let barColor: string;
   if (pct >= 90 && pct <= 115) {
-    color = "bg-green-500";
+    barColor = "var(--color-green)";
   } else if (pct >= 70) {
-    color = "bg-amber-400";
+    barColor = "var(--color-amber)";
   } else {
-    color = "bg-neutral-300 dark:bg-neutral-600";
+    barColor = "var(--color-border-strong)";
   }
 
   return (
@@ -61,14 +60,23 @@ function ProgressBar({ current, target }: ProgressBarProps) {
       className="flex items-center gap-2"
       title={`${current} / ${target} words (${pct}%)`}
     >
-      <div className="h-1.5 w-24 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
+      <div
+        className="overflow-hidden"
+        style={{ width: 96, height: 6, borderRadius: 9999, background: "var(--color-border-default)" }}
+      >
         <div
-          className={`h-full rounded-full transition-all duration-300 ${color}`}
-          style={{ width: `${pct}%` }}
+          style={{
+            height: "100%",
+            borderRadius: 9999,
+            width: `${pct}%`,
+            background: barColor,
+            transition: "width 0.3s",
+          }}
         />
       </div>
-      <span className="tabular-nums text-xs text-neutral-500 dark:text-neutral-400">
-        {current}<span className="text-neutral-300 dark:text-neutral-600">/{target}</span>
+      <span className="tabular-nums text-xs" style={{ color: "var(--color-text-muted)" }}>
+        {current}
+        <span style={{ color: "var(--color-border-strong)" }}>/{target}</span>
       </span>
     </div>
   );
@@ -79,10 +87,10 @@ function ProgressBar({ current, target }: ProgressBarProps) {
 // ---------------------------------------------------------------------------
 
 const FORMAT_CONFIG: Record<ExportFormat, { label: string; icon: string; title: string }> = {
-  docx:      { label: "Word",      icon: "⬇",  title: "Download as Word (.docx)"             },
-  bilingual: { label: "EN | VI",   icon: "⬇",  title: "Download bilingual Word (.docx)"      },
-  html:      { label: "HTML",      icon: "⬇",  title: "Download as HTML file"                },
-  pdf:       { label: "PDF",        icon: "⬇",  title: "Download as PDF"                      },
+  docx:      { label: "Word",    icon: "⬇", title: "Download as Word (.docx)"        },
+  bilingual: { label: "EN | VI", icon: "⬇", title: "Download bilingual Word (.docx)" },
+  html:      { label: "HTML",    icon: "⬇", title: "Download as HTML file"           },
+  pdf:       { label: "PDF",     icon: "⬇", title: "Download as PDF"                 },
 };
 
 interface ExportButtonProps {
@@ -100,17 +108,13 @@ function ExportButton({ format, loading, disabled, onClick }: ExportButtonProps)
       title={cfg.title}
       disabled={disabled}
       onClick={onClick}
-      className={[
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
-        "ring-1 ring-inset transition-colors",
-        "disabled:cursor-not-allowed disabled:opacity-40",
-        "bg-white text-neutral-600 ring-neutral-200 hover:bg-neutral-50 hover:text-neutral-900",
-        "dark:bg-neutral-900 dark:text-neutral-300 dark:ring-neutral-700",
-        "dark:hover:bg-neutral-800 dark:hover:text-neutral-100",
-      ].join(" ")}
+      className="btn-pill"
     >
       {loading
-        ? <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-neutral-400 border-t-transparent" />
+        ? <span
+            className="inline-block h-3 w-3 animate-spin rounded-full border-2"
+            style={{ borderColor: "var(--color-border-strong)", borderTopColor: "transparent" }}
+          />
         : <span aria-hidden="true">{cfg.icon}</span>
       }
       {cfg.label}
@@ -136,11 +140,8 @@ export function DocumentToolbar({
   // ── Live word count ───────────────────────────────────────────────────────
   useEffect(() => {
     if (!editor) return;
-
     const update = () => setWordCount(countWords(editor.getText()));
-    // Initial value
     update();
-
     editor.on("update", update);
     return () => { editor.off("update", update); };
   }, [editor]);
@@ -148,13 +149,11 @@ export function DocumentToolbar({
   // ── Export ────────────────────────────────────────────────────────────────
   const handleExport = useCallback(async (format: ExportFormat) => {
     if (!editor || !draftId) return;
-
     const htmlContent = editor.getHTML();
     if (!htmlContent.trim()) return;
 
     setExportState({ format, status: "loading", error: null });
 
-    // ── PDF: fully client-side via html2pdf.js ────────────────────────────
     if (format === "pdf") {
       try {
         await exportToPdf(htmlContent, { filename: "document.pdf" });
@@ -166,7 +165,6 @@ export function DocumentToolbar({
       return;
     }
 
-    // ── DOCX / HTML / bilingual: server route ────────────────────────────
     try {
       const res = await fetch(`/api/drafts/${draftId}/export`, {
         method:  "POST",
@@ -188,7 +186,6 @@ export function DocumentToolbar({
       const { url, filename: serverFilename } =
         await res.json() as { url: string; filename: string; expiresAt: string };
 
-      // Trigger browser download from pre-signed R2 URL
       const a = Object.assign(document.createElement("a"), { href: url, download: serverFilename });
       document.body.appendChild(a);
       a.click();
@@ -203,7 +200,6 @@ export function DocumentToolbar({
 
   const isExporting = exportState.status === "loading";
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -213,7 +209,7 @@ export function DocumentToolbar({
           {targetWordCount ? (
             <ProgressBar current={wordCount} target={targetWordCount} />
           ) : (
-            <span className="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">
+            <span className="tabular-nums text-xs" style={{ color: "var(--color-text-muted)" }}>
               {wordCount} words
             </span>
           )}
@@ -221,24 +217,20 @@ export function DocumentToolbar({
 
         {/* Right: translation toggle + export buttons */}
         <div className="flex flex-wrap items-center gap-1.5">
-          {/* Translation toggle */}
           <button
             type="button"
             onClick={onToggleTranslation}
-            className={[
-              "rounded-full px-2.5 py-1 text-xs font-medium ring-1 transition-colors",
-              showTranslation
-                ? "bg-indigo-50 text-indigo-700 ring-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:ring-indigo-800"
-                : "bg-white text-neutral-600 ring-neutral-200 hover:bg-neutral-50 hover:text-neutral-900 dark:bg-neutral-900 dark:text-neutral-300 dark:ring-neutral-700 dark:hover:bg-neutral-800",
-            ].join(" ")}
+            className={`btn-pill ${showTranslation ? "btn-pill-active" : ""}`}
           >
             🇻🇳 {showTranslation ? "Hide translation" : "Translate"}
           </button>
 
-          {/* Divider */}
-          <span className="h-4 w-px bg-neutral-200 dark:bg-neutral-700" aria-hidden="true" />
+          <span
+            className="h-4 w-px"
+            style={{ background: "var(--color-border-default)" }}
+            aria-hidden="true"
+          />
 
-          {/* Export buttons */}
           {(["docx", "html", "pdf"] as ExportFormat[]).map((fmt) => (
             <ExportButton
               key={fmt}
@@ -248,7 +240,6 @@ export function DocumentToolbar({
               onClick={() => handleExport(fmt)}
             />
           ))}
-          {/* Bilingual export — only when translation is available */}
           {vietnameseText && (
             <ExportButton
               format="bilingual"
@@ -262,7 +253,7 @@ export function DocumentToolbar({
 
       {/* Export error */}
       {exportState.status === "error" && exportState.error && (
-        <p className="text-xs text-red-500">{exportState.error}</p>
+        <p className="text-xs" style={{ color: "var(--color-red)" }}>{exportState.error}</p>
       )}
     </div>
   );

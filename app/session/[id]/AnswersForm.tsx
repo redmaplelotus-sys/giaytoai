@@ -71,7 +71,6 @@ export function AnswersForm({
     [sessionId],
   );
 
-  // Refs so event handlers always read current state without stale closures.
   const answersRef = useRef(answers);
   const sourcesRef = useRef(sources);
   useEffect(() => { answersRef.current = answers; }, [answers]);
@@ -88,7 +87,6 @@ export function AnswersForm({
     saveToDb(answersRef.current);
   }
 
-  // Called when CV extraction completes — only fills empty slots.
   function handleExtracted(extracted: Record<string, string>) {
     const relevant = Object.fromEntries(
       Object.entries(extracted).filter(([k]) => questions.includes(k)),
@@ -105,7 +103,6 @@ export function AnswersForm({
     saveToDb(nextAnswers);
   }
 
-  // Progress
   const filled = questions.filter((f) => answers[f]?.trim().length > 0).length;
   const total = questions.length;
   const pct = total === 0 ? 100 : Math.round((filled / total) * 100);
@@ -117,17 +114,24 @@ export function AnswersForm({
     });
   }
 
+  const saveStatusColor: Record<SaveState, string> = {
+    idle:   "transparent",
+    saving: "var(--color-text-muted)",
+    saved:  "var(--color-green)",
+    error:  "var(--color-red)",
+  };
+
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10 space-y-8">
+    <main className="page-container py-10 space-y-8">
       {/* ── Header ── */}
       <div className="space-y-1">
-        <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">
+        <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>
           {docTypeName}
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-text-primary)", letterSpacing: "-0.02em" }}>
           {t("answersHeading")}
         </h1>
-        <p className="text-sm text-neutral-500">{t("answersSubheading")}</p>
+        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>{t("answersSubheading")}</p>
       </div>
 
       {/* ── CV drop zone ── */}
@@ -135,26 +139,24 @@ export function AnswersForm({
 
       {/* ── Progress bar ── */}
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-xs text-neutral-500">
+        <div className="flex items-center justify-between text-xs" style={{ color: "var(--color-text-muted)" }}>
           <span>{t("progress", { filled, total })}</span>
-          <span
-            className={
-              saveState === "error"
-                ? "text-red-500"
-                : saveState === "saving"
-                  ? "text-neutral-400"
-                  : saveState === "saved"
-                    ? "text-green-600 dark:text-green-400"
-                    : ""
-            }
-          >
+          <span style={{ color: saveStatusColor[saveState] }}>
             {saveState !== "idle" && t(`saveStatus.${saveState}` as "saveStatus.saved")}
           </span>
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+        <div
+          className="overflow-hidden"
+          style={{ height: 6, borderRadius: 9999, background: "var(--color-border-default)" }}
+        >
           <div
-            className="h-full rounded-full bg-neutral-900 transition-all duration-300 dark:bg-white"
-            style={{ width: `${pct}%` }}
+            style={{
+              height: "100%",
+              borderRadius: 9999,
+              width: `${pct}%`,
+              background: "var(--color-navy)",
+              transition: "width 0.3s",
+            }}
           />
         </div>
       </div>
@@ -183,7 +185,7 @@ export function AnswersForm({
       {/* ── Generate button ── */}
       <div className="space-y-2 pt-2">
         {!allFilled && (
-          <p className="text-center text-xs text-neutral-400">
+          <p className="text-center text-xs" style={{ color: "var(--color-text-muted)" }}>
             {t("fieldsRemaining", { count: total - filled })}
           </p>
         )}
@@ -191,13 +193,8 @@ export function AnswersForm({
           type="button"
           onClick={handleGenerate}
           disabled={!allFilled}
-          className={[
-            "w-full rounded-xl py-3 text-sm font-semibold transition-colors",
-            "focus-visible:outline-none focus-visible:ring-2",
-            allFilled
-              ? "bg-neutral-900 text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-              : "cursor-not-allowed bg-neutral-100 text-neutral-400 dark:bg-neutral-800 dark:text-neutral-600",
-          ].join(" ")}
+          className="btn-primary w-full"
+          style={{ padding: "12px 20px", borderRadius: "var(--radius-xl)", fontSize: 15 }}
         >
           {t("generateButton")}
         </button>
