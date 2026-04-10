@@ -1,10 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { serverEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/server-env";
 
 export const anthropic = new Anthropic({
   apiKey: serverEnv.anthropicApiKey,
-  baseURL: "https://anthropic.helicone.ai",
-  defaultHeaders: {
-    "helicone-auth": `Bearer ${serverEnv.heliconeApiKey}`,
-  },
+  ...(serverEnv.heliconeApiKey && {
+    baseURL: "https://anthropic.helicone.ai",
+    defaultHeaders: { "helicone-auth": `Bearer ${serverEnv.heliconeApiKey}` },
+  }),
 });
