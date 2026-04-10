@@ -122,7 +122,7 @@ export function AnswersForm({
   };
 
   return (
-    <main className="space-y-8" style={{ width: "100%", maxWidth: 1400, marginLeft: "auto", marginRight: "auto", paddingTop: 40, paddingBottom: 40, paddingLeft: "clamp(20px, 4vw, 64px)", paddingRight: "clamp(20px, 4vw, 64px)" }}>
+    <main className="page-container space-y-8" style={{ paddingTop: 40, paddingBottom: 40 }}>
       {/* ── Header ── */}
       <div className="space-y-1">
         <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>
