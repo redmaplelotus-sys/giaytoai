@@ -155,7 +155,7 @@ export async function POST(request: Request) {
       .single(),
     supabaseAdmin
       .from("users")
-      .select("id, credits_remaining, plan")
+      .select("clerk_id, credits_remaining, plan")
       .eq("clerk_id", userId)
       .single(),
   ]);
@@ -169,14 +169,14 @@ export async function POST(request: Request) {
   }
 
   const { id: documentTypeId } = docTypeResult.data;
-  const { id: internalUserId, credits_remaining, plan } = userResult.data;
+  const { credits_remaining, plan } = userResult.data;
 
   // Credit gate — unlimited plan bypasses the check
   if (plan !== "unlimited" && credits_remaining <= 0) {
     return NextResponse.json({ error: "no_credits" }, { status: 402 });
   }
 
-  const session = await createSession(internalUserId, documentTypeId);
+  const session = await createSession(userId, documentTypeId);
   await saveAnswers(session.id, answers);
 
   return NextResponse.json({ id: session.id }, { status: 201 });

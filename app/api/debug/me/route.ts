@@ -8,7 +8,7 @@ export async function GET() {
 
   const { data, error } = await supabaseAdmin
     .from("users")
-    .select("id, clerk_id, email, credits_remaining, plan")
+    .select("clerk_id, email, credits_remaining, plan")
     .eq("clerk_id", userId)
     .single();
 
