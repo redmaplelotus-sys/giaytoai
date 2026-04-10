@@ -5,103 +5,10 @@ import { useRouter } from "next/navigation";
 import { useT } from "@/lib/i18n";
 import { getMeta, SYSTEM_FIELDS } from "@/lib/session/field-meta";
 import { QuestionField, type FieldSource } from "./QuestionField";
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+import { CvDropZone } from "./CvDropZone";
 
 function initSource(value: string): FieldSource {
-  // Pre-seeded from DB (wizard or prior session) → prompt user to review
   return value.trim() ? "extracted" : "missing";
-}
-
-// ---------------------------------------------------------------------------
-// CV Extraction panel
-// ---------------------------------------------------------------------------
-
-interface CVPanelProps {
-  sessionId: string;
-  onExtracted: (values: Record<string, string>) => void;
-}
-
-function CVPanel({ sessionId, onExtracted }: CVPanelProps) {
-  const [open, setOpen] = useState(false);
-  const [cvText, setCvText] = useState("");
-  const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
-  const [count, setCount] = useState(0);
-
-  async function handleExtract() {
-    if (!cvText.trim()) return;
-    setState("loading");
-    try {
-      const res = await fetch(`/api/sessions/${sessionId}/extract`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cvText }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { extracted: Record<string, string>; count: number };
-      setCount(data.count);
-      onExtracted(data.extracted);
-      setState("done");
-      setOpen(false);
-    } catch {
-      setState("error");
-    }
-  }
-
-  return (
-    <div className="rounded-xl border border-dashed border-neutral-200 dark:border-neutral-700">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between px-4 py-3 text-sm text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
-      >
-        <span className="font-medium">
-          {state === "done"
-            ? `✓ ${count} fields extracted from CV`
-            : "Prefill from CV"}
-        </span>
-        <span aria-hidden="true" className="text-xs">{open ? "▲" : "▼"}</span>
-      </button>
-
-      {open && (
-        <div className="border-t border-neutral-100 dark:border-neutral-800 px-4 pb-4 space-y-3">
-          <p className="pt-3 text-xs text-neutral-400 leading-relaxed">
-            Paste your CV or résumé text. Fields that can be extracted will be
-            pre-filled for your review — nothing is saved until you blur each field.
-          </p>
-          <textarea
-            value={cvText}
-            onChange={(e) => setCvText(e.target.value)}
-            rows={6}
-            placeholder="Paste CV text here…"
-            className="w-full resize-y rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm placeholder-neutral-300 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:placeholder-neutral-600 dark:focus:border-white dark:focus:ring-white"
-          />
-          <p className="text-right text-xs text-neutral-400 tabular-nums">
-            {cvText.length.toLocaleString()} / 12,000 chars
-          </p>
-          {state === "error" && (
-            <p className="text-xs text-red-500">Extraction failed — please try again.</p>
-          )}
-          <button
-            type="button"
-            onClick={handleExtract}
-            disabled={!cvText.trim() || state === "loading" || cvText.length > 12_000}
-            className={[
-              "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-              "focus-visible:outline-none focus-visible:ring-2",
-              cvText.trim() && state !== "loading" && cvText.length <= 12_000
-                ? "bg-neutral-900 text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900"
-                : "cursor-not-allowed bg-neutral-100 text-neutral-400 dark:bg-neutral-800",
-            ].join(" ")}
-          >
-            {state === "loading" ? "Extracting…" : "Extract"}
-          </button>
-        </div>
-      )}
-    </div>
-  );
 }
 
 // ---------------------------------------------------------------------------
@@ -226,8 +133,8 @@ export function AnswersForm({
         <p className="text-sm text-neutral-500">{t("answersSubheading")}</p>
       </div>
 
-      {/* ── CV extraction panel ── */}
-      <CVPanel sessionId={sessionId} onExtracted={handleExtracted} />
+      {/* ── CV drop zone ── */}
+      <CvDropZone sessionId={sessionId} onExtracted={handleExtracted} />
 
       {/* ── Progress bar ── */}
       <div className="space-y-1.5">
