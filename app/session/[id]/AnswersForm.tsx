@@ -3,94 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useT } from "@/lib/i18n";
+import { getMeta, SYSTEM_FIELDS } from "@/lib/session/field-meta";
 import { QuestionField, type FieldSource } from "./QuestionField";
 
 // ---------------------------------------------------------------------------
-// Field metadata
+// Helpers
 // ---------------------------------------------------------------------------
-
-type FieldType = "text" | "textarea" | "number";
-
-interface FieldMeta {
-  label: string;
-  hint?: string;
-  type: FieldType;
-  rows?: number;
-}
-
-const FIELD_META: Record<string, FieldMeta> = {
-  // Identity
-  full_name:                        { label: "Full name", type: "text" },
-  applicant_name:                   { label: "Applicant name", type: "text" },
-  referee_name:                     { label: "Referee name", type: "text" },
-  referee_title:                    { label: "Referee title / position", type: "text" },
-  referee_institution:              { label: "Referee institution", type: "text" },
-  relationship_and_duration:        { label: "Relationship & duration", hint: "e.g. Thesis supervisor for 2 years", type: "text" },
-  // Targets
-  target_university:                { label: "Target university", type: "text" },
-  target_degree:                    { label: "Degree / programme", type: "text" },
-  target_subject:                   { label: "Target subject", type: "text" },
-  target_programme:                 { label: "Target programme", type: "text" },
-  target_institution:               { label: "Target institution", type: "text" },
-  target_role:                      { label: "Target role / job title", type: "text" },
-  target_company:                   { label: "Target company", type: "text" },
-  target_programme_or_role:         { label: "Target programme or role", type: "text" },
-  scholarship_name:                 { label: "Scholarship name", type: "text" },
-  // Limits
-  word_limit:                       { label: "Word limit", hint: "Maximum words", type: "number" },
-  length_limit:                     { label: "Length limit", hint: "Words (EN/ZH) or characters (KO)", type: "number" },
-  // Academic
-  academic_background:              { label: "Academic background", hint: "Degrees, institutions, GPA, relevant coursework", type: "textarea" },
-  achievements:                     { label: "Key achievements", hint: "Academic, extracurricular, and professional highlights", type: "textarea" },
-  academic_achievements:            { label: "Academic achievements", type: "textarea" },
-  subject_interest_evidence:        { label: "Evidence of subject interest", hint: "Specific books, projects, experiments, competitions", type: "textarea" },
-  relevant_reading_or_projects:     { label: "Relevant reading or independent projects", type: "textarea" },
-  // Experience
-  work_experience:                  { label: "Work / volunteer experience", type: "textarea" },
-  extracurriculars:                 { label: "Extracurricular activities", type: "textarea" },
-  current_background:               { label: "Current title / background", hint: "e.g. Final-year CS student at HCMUT", type: "text" },
-  relevant_experience:              { label: "Relevant experience", hint: "Roles, projects, or achievements directly related to the role", type: "textarea" },
-  key_skills:                       { label: "Key skills", hint: "Technical and soft skills — be specific", type: "textarea" },
-  highlight_achievement:            { label: "Highlight achievement", hint: "Your single strongest result to feature prominently", type: "textarea" },
-  applicant_strengths:              { label: "Applicant strengths", hint: "Qualities and skills for the referee to vouch for", type: "textarea" },
-  specific_examples:                { label: "Specific examples or anecdotes", hint: "Concrete stories the referee witnessed first-hand", type: "textarea" },
-  // Motivation
-  motivation:                       { label: "Motivation for this role", type: "textarea" },
-  company_motivation:               { label: "Why this company specifically", hint: "Name a product, value, initiative, or team", type: "textarea" },
-  why_this_degree:                  { label: "Why this degree", type: "textarea" },
-  why_australia:                    { label: "Why Australia / why this university", type: "textarea" },
-  why_this_programme:               { label: "Why this programme", hint: "Name a specific course, professor, or research group", type: "textarea" },
-  research_or_professional_interest:{ label: "Research or professional interest", type: "textarea" },
-  career_goal:                      { label: "Long-term career goal", type: "textarea" },
-  future_plans:                     { label: "Future plans", hint: "How the scholarship or opportunity enables your goals", type: "textarea" },
-  // Essays
-  personal_story:                   { label: "Personal story", hint: "A formative experience or moment that defines you", type: "textarea" },
-  challenge_or_growth:              { label: "Challenge or moment of growth", type: "textarea" },
-  intellectual_interest:            { label: "Intellectual interest / academic passion", type: "textarea" },
-  prompt_text:                      { label: "Essay prompt", hint: "Paste the exact prompt or question", type: "textarea" },
-  essay_prompt:                     { label: "Scholarship essay prompt", hint: "Paste the exact prompt", type: "textarea" },
-  financial_or_personal_context:    { label: "Financial or personal context", type: "textarea" },
-  community_impact_or_leadership:   { label: "Community impact or leadership", type: "textarea" },
-  // Translation
-  document_type:                    { label: "Document type", hint: "e.g. Diploma, Academic Transcript, Birth Certificate", type: "text" },
-  purpose:                          { label: "Purpose of translation", hint: "e.g. University application in Korea, visa application", type: "text" },
-  source_text_vi:                   { label: "Source document (Vietnamese)", hint: "Paste the full text of the original document", type: "textarea", rows: 8 },
-};
-
-const SYSTEM_FIELDS = new Set([
-  "output_language",
-  "goal",
-  "destination",
-  "target_word_count",
-]);
-
-function autoLabel(key: string): string {
-  return key.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-}
-
-function getMeta(key: string): FieldMeta {
-  return FIELD_META[key] ?? { label: autoLabel(key), type: "textarea" };
-}
 
 function initSource(value: string): FieldSource {
   // Pre-seeded from DB (wizard or prior session) → prompt user to review
@@ -98,7 +16,96 @@ function initSource(value: string): FieldSource {
 }
 
 // ---------------------------------------------------------------------------
-// Component
+// CV Extraction panel
+// ---------------------------------------------------------------------------
+
+interface CVPanelProps {
+  sessionId: string;
+  onExtracted: (values: Record<string, string>) => void;
+}
+
+function CVPanel({ sessionId, onExtracted }: CVPanelProps) {
+  const [open, setOpen] = useState(false);
+  const [cvText, setCvText] = useState("");
+  const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [count, setCount] = useState(0);
+
+  async function handleExtract() {
+    if (!cvText.trim()) return;
+    setState("loading");
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/extract`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cvText }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = (await res.json()) as { extracted: Record<string, string>; count: number };
+      setCount(data.count);
+      onExtracted(data.extracted);
+      setState("done");
+      setOpen(false);
+    } catch {
+      setState("error");
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-dashed border-neutral-200 dark:border-neutral-700">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between px-4 py-3 text-sm text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
+      >
+        <span className="font-medium">
+          {state === "done"
+            ? `✓ ${count} fields extracted from CV`
+            : "Prefill from CV"}
+        </span>
+        <span aria-hidden="true" className="text-xs">{open ? "▲" : "▼"}</span>
+      </button>
+
+      {open && (
+        <div className="border-t border-neutral-100 dark:border-neutral-800 px-4 pb-4 space-y-3">
+          <p className="pt-3 text-xs text-neutral-400 leading-relaxed">
+            Paste your CV or résumé text. Fields that can be extracted will be
+            pre-filled for your review — nothing is saved until you blur each field.
+          </p>
+          <textarea
+            value={cvText}
+            onChange={(e) => setCvText(e.target.value)}
+            rows={6}
+            placeholder="Paste CV text here…"
+            className="w-full resize-y rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm placeholder-neutral-300 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:placeholder-neutral-600 dark:focus:border-white dark:focus:ring-white"
+          />
+          <p className="text-right text-xs text-neutral-400 tabular-nums">
+            {cvText.length.toLocaleString()} / 12,000 chars
+          </p>
+          {state === "error" && (
+            <p className="text-xs text-red-500">Extraction failed — please try again.</p>
+          )}
+          <button
+            type="button"
+            onClick={handleExtract}
+            disabled={!cvText.trim() || state === "loading" || cvText.length > 12_000}
+            className={[
+              "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+              "focus-visible:outline-none focus-visible:ring-2",
+              cvText.trim() && state !== "loading" && cvText.length <= 12_000
+                ? "bg-neutral-900 text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900"
+                : "cursor-not-allowed bg-neutral-100 text-neutral-400 dark:bg-neutral-800",
+            ].join(" ")}
+          >
+            {state === "loading" ? "Extracting…" : "Extract"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main form
 // ---------------------------------------------------------------------------
 
 interface AnswersFormProps {
@@ -155,7 +162,7 @@ export function AnswersForm({
     [sessionId],
   );
 
-  // Capture latest answers in a ref so blur handlers always see fresh state
+  // Keep a ref so blur handlers always see current answers
   const answersRef = useRef(answers);
   useEffect(() => { answersRef.current = answers; }, [answers]);
 
@@ -166,12 +173,32 @@ export function AnswersForm({
 
   function handleBlur(field: string) {
     const value = answersRef.current[field] ?? "";
-    // Promote source: missing / extracted → confirm once the user has touched it
     setSources((prev) => ({
       ...prev,
       [field]: value.trim() ? "confirm" : "missing",
     }));
     saveToDb(answersRef.current);
+  }
+
+  // Called when CV extraction completes — bulk-apply extracted values
+  function handleExtracted(extracted: Record<string, string>) {
+    setAnswers((prev) => {
+      const next = { ...prev };
+      for (const [k, v] of Object.entries(extracted)) {
+        if (questions.includes(k)) next[k] = v;
+      }
+      return next;
+    });
+    setSources((prev) => {
+      const next = { ...prev };
+      for (const k of Object.keys(extracted)) {
+        if (questions.includes(k)) next[k] = "extracted";
+      }
+      return next;
+    });
+    // Save all extracted values to DB at once
+    const merged = { ...answersRef.current, ...extracted };
+    saveToDb(merged);
   }
 
   // Progress
@@ -198,6 +225,9 @@ export function AnswersForm({
         </h1>
         <p className="text-sm text-neutral-500">{t("answersSubheading")}</p>
       </div>
+
+      {/* ── CV extraction panel ── */}
+      <CVPanel sessionId={sessionId} onExtracted={handleExtracted} />
 
       {/* ── Progress bar ── */}
       <div className="space-y-1.5">

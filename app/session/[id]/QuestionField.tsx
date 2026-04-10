@@ -13,20 +13,21 @@ const BADGE: Record<
   missing: {
     icon: "○",
     label: "Required",
-    className:
-      "text-neutral-400 dark:text-neutral-600",
+    className: "text-neutral-400 dark:text-neutral-500",
   },
   extracted: {
     icon: "◈",
     label: "Review",
     className:
-      "rounded-full bg-amber-50 px-1.5 py-0.5 text-amber-600 ring-1 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:ring-amber-800",
+      "rounded-full bg-amber-50 px-1.5 py-0.5 text-amber-600 ring-1 ring-amber-200 " +
+      "dark:bg-amber-900/20 dark:text-amber-400 dark:ring-amber-800",
   },
   confirm: {
     icon: "✓",
     label: "Saved",
     className:
-      "rounded-full bg-green-50 px-1.5 py-0.5 text-green-600 ring-1 ring-green-200 dark:bg-green-900/20 dark:text-green-400 dark:ring-green-800",
+      "rounded-full bg-green-50 px-1.5 py-0.5 text-green-700 ring-1 ring-green-200 " +
+      "dark:bg-green-900/20 dark:text-green-400 dark:ring-green-800",
   },
 };
 
@@ -36,7 +37,7 @@ function SourceBadge({ source }: { source: FieldSource }) {
     <span
       aria-label={label}
       title={label}
-      className={`inline-flex items-center gap-0.5 text-xs font-medium leading-none select-none ${className}`}
+      className={`inline-flex shrink-0 items-center gap-0.5 text-xs font-medium leading-none select-none ${className}`}
     >
       <span aria-hidden="true">{icon}</span>
       <span>{label}</span>
@@ -45,24 +46,29 @@ function SourceBadge({ source }: { source: FieldSource }) {
 }
 
 // ---------------------------------------------------------------------------
-// Input variants
+// Border and ring by source
 // ---------------------------------------------------------------------------
 
-const BASE_INPUT =
-  "w-full rounded-lg border bg-white px-3 py-2 text-sm " +
-  "placeholder-neutral-300 " +
-  "transition-colors focus:outline-none focus:ring-1 " +
-  "focus:border-neutral-900 focus:ring-neutral-900 " +
-  "dark:bg-neutral-900 dark:placeholder-neutral-600 " +
-  "dark:focus:border-white dark:focus:ring-white";
+const BORDER: Record<FieldSource, string> = {
+  missing:   "border-red-200   dark:border-red-900",
+  extracted: "border-amber-300 dark:border-amber-700",
+  confirm:   "border-green-300 dark:border-green-700",
+};
 
-const BORDER_BY_SOURCE: Record<FieldSource, string> = {
-  missing:
-    "border-neutral-200 dark:border-neutral-700",
-  extracted:
-    "border-amber-300 dark:border-amber-700",
-  confirm:
-    "border-neutral-200 dark:border-neutral-700",
+const FOCUS_RING: Record<FieldSource, string> = {
+  missing:   "focus:border-red-400   focus:ring-red-400   dark:focus:border-red-600   dark:focus:ring-red-600",
+  extracted: "focus:border-amber-500 focus:ring-amber-500 dark:focus:border-amber-500 dark:focus:ring-amber-500",
+  confirm:   "focus:border-green-500 focus:ring-green-500 dark:focus:border-green-500 dark:focus:ring-green-500",
+};
+
+// ---------------------------------------------------------------------------
+// Char count display
+// ---------------------------------------------------------------------------
+
+const COUNT_COLOR = (n: number): string => {
+  if (n === 0) return "text-neutral-300 dark:text-neutral-600";
+  if (n < 50)  return "text-amber-500";
+  return "text-neutral-400 dark:text-neutral-500";
 };
 
 // ---------------------------------------------------------------------------
@@ -92,17 +98,19 @@ export function QuestionField({
   onChange,
   onBlur,
 }: QuestionFieldProps) {
-  const borderCls = BORDER_BY_SOURCE[source];
+  const border = BORDER[source];
+  const focusRing = FOCUS_RING[source];
 
-  const sharedProps = {
-    id,
-    value,
-    onChange: (
-      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    ) => onChange(e.target.value),
-    onBlur,
-    className: `${BASE_INPUT} ${borderCls}`,
-  };
+  const baseClass =
+    "w-full rounded-lg border bg-white px-3 py-2 text-sm " +
+    "placeholder-neutral-300 transition-colors " +
+    "focus:outline-none focus:ring-1 " +
+    "dark:bg-neutral-900 dark:placeholder-neutral-600 " +
+    `${border} ${focusRing}`;
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => onChange(e.target.value);
 
   return (
     <div className="space-y-1.5">
@@ -121,16 +129,38 @@ export function QuestionField({
 
       {/* Input */}
       {type === "textarea" ? (
-        <textarea {...sharedProps} rows={rows} className={`${sharedProps.className} resize-y`} />
+        <>
+          <textarea
+            id={id}
+            value={value}
+            rows={rows}
+            onChange={handleChange}
+            onBlur={onBlur}
+            className={`${baseClass} resize-y`}
+          />
+          <p className={`text-right text-xs tabular-nums ${COUNT_COLOR(value.length)}`}>
+            {value.length.toLocaleString()} chars
+          </p>
+        </>
       ) : type === "number" ? (
         <input
-          {...sharedProps}
+          id={id}
           type="number"
           min={0}
-          className={`w-36 rounded-lg border bg-white px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-1 focus:border-neutral-900 focus:ring-neutral-900 dark:bg-neutral-900 dark:focus:border-white dark:focus:ring-white ${borderCls}`}
+          value={value}
+          onChange={handleChange}
+          onBlur={onBlur}
+          className={baseClass.replace("w-full", "w-36")}
         />
       ) : (
-        <input {...sharedProps} type="text" />
+        <input
+          id={id}
+          type="text"
+          value={value}
+          onChange={handleChange}
+          onBlur={onBlur}
+          className={baseClass}
+        />
       )}
     </div>
   );
