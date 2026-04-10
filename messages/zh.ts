@@ -31,7 +31,10 @@ const zh: Translations = {
     pricing: "价格方案",
     settings: "设置",
     signOut: "退出登录",
-    credits: "剩余 {count} 份文件",
+    credits: "剩余 {count} 次",
+    noCredits: "次数已用完",
+    signIn: "登录",
+    tryFree: "免费试用",
   },
   auth: {
     signIn: {

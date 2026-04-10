@@ -1,0 +1,778 @@
+/* ═══════════════════════════════════════════════════════════════
+   LANDING PAGE – CSS MODULE
+   All pixel values / colours taken directly from the spec.
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Section 1: Hero ─────────────────────────────────────────── */
+.heroSection {
+  padding: 64px 32px 0;
+}
+.heroInner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+.heroLeft {}
+.heroRight {}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #EAF3DE;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  color: #27500A;
+  margin-bottom: 24px;
+}
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3B6D11;
+  flex-shrink: 0;
+}
+.heroH1 {
+  font-size: 36px;
+  font-weight: 500;
+  color: #1B3A5C;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+.heroH1Accent { color: #185FA5; }
+.heroParagraph {
+  font-size: 15px;
+  color: #5F5E5A;
+  line-height: 1.7;
+  max-width: 380px;
+  margin: 0 0 28px;
+}
+.ctaRow {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  background: #1B3A5C;
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.ctaPrimary:hover { background: #185FA5; }
+.ctaOutline {
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  color: #1B3A5C;
+  border: 1.5px solid #1B3A5C;
+  padding: 11px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.ctaOutline:hover { background: #F0F4F8; }
+.ctaNote {
+  font-size: 12px;
+  color: #B4B2A9;
+  margin: 14px 0 0;
+}
+
+/* ── Carousel ─────────────────────────────────────────────────── */
+.carousel {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #E8E8E4;
+  background: #F5F4F0;
+  position: relative;
+  aspect-ratio: 4 / 3;
+}
+.carouselTrack {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.4s ease;
+}
+.carouselSlide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.slidePlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slideImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.slideCaption {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.captionIconBox {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.captionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1B3A5C;
+  margin: 0;
+  line-height: 1.3;
+}
+.captionSub {
+  font-size: 11px;
+  color: #888780;
+  margin: 2px 0 0;
+}
+.carouselArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #E8E8E4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 2;
+}
+.carousel:hover .carouselArrow { opacity: 1; }
+.carouselArrowPrev { left: 10px; }
+.carouselArrowNext { right: 10px; }
+.carouselDots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  z-index: 2;
+}
+.dot {
+  height: 6px;
+  width: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: width 0.25s, background 0.25s;
+}
+.dotActive {
+  width: 18px;
+  background: rgba(255, 255, 255, 1);
+}
+
+/* Wireframe placeholder for slide 2 */
+.wireframe {
+  padding: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+}
+.wireframeHeader {
+  height: 26px;
+  background: #E8E8E4;
+  border-radius: 6px;
+  width: 55%;
+}
+.wireframeLine {
+  height: 10px;
+  background: #EFEFEB;
+  border-radius: 4px;
+}
+.wireframeLineShort { width: 70%; }
+.wireframeBlock {
+  height: 76px;
+  background: #E6F1FB;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+
+/* ── Section 2: Trust Bar ────────────────────────────────────── */
+.trustBar {
+  background: #fff;
+  border-top: 1px solid #F1EFE8;
+  border-bottom: 1px solid #F1EFE8;
+  padding: 18px 32px;
+}
+.trustBarInner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.trustItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #888780;
+}
+
+/* ── Shared section header ───────────────────────────────────── */
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: #185FA5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+.sectionH2 {
+  font-size: 28px;
+  font-weight: 500;
+  color: #1B3A5C;
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+.sectionSubtitle {
+  font-size: 15px;
+  color: #5F5E5A;
+  margin: 0 0 36px;
+  line-height: 1.6;
+}
+
+/* ── Section 3: Why Not ChatGPT ──────────────────────────────── */
+.whySection {
+  background: #fff;
+  padding: 64px 32px;
+}
+.whyInner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.compGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.compCard {
+  border: 1px solid #E8E8E4;
+  border-radius: 12px;
+  padding: 24px;
+  background: #fff;
+}
+.compCardFeatured {
+  border: 1.5px solid #185FA5;
+  background: #FAFCFF;
+}
+.compLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #888780;
+  letter-spacing: 0.08em;
+  margin: 0 0 16px;
+  font-weight: 500;
+}
+.compLabelFeatured { color: #185FA5; }
+.compItems {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.compItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: #5F5E5A;
+  line-height: 1.5;
+}
+.compItemFeatured { color: #444441; }
+
+/* ── Section 4: How It Works ─────────────────────────────────── */
+.howSection {
+  background: #FAFAFA;
+  border-top: 1px solid #F1EFE8;
+  border-bottom: 1px solid #F1EFE8;
+  padding: 64px 32px;
+}
+.howInner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.stepCard {
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 12px;
+  padding: 24px;
+}
+.stepNum {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #1B3A5C;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.stepH3 {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1B3A5C;
+  margin: 0 0 8px;
+}
+.stepP {
+  font-size: 13px;
+  color: #5F5E5A;
+  line-height: 1.6;
+  margin: 0;
+}
+.timeBadge {
+  display: inline-block;
+  background: #E6F1FB;
+  color: #0C447C;
+  border-radius: 10px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+/* ── Section 5: Documents ────────────────────────────────────── */
+.docsSection {
+  background: #fff;
+  padding: 64px 32px;
+}
+.docsInner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.langTabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.langTab {
+  padding: 7px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  border: 1px solid #E8E8E4;
+  background: #fff;
+  color: #5F5E5A;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.langTabActive {
+  background: #1B3A5C;
+  color: #fff;
+  border-color: #1B3A5C;
+}
+.docsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.docCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.docIconBox {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.docMeta { min-width: 0; }
+.docName {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1B3A5C;
+  margin: 0 0 3px;
+}
+.docDesc {
+  font-size: 12px;
+  color: #888780;
+  line-height: 1.4;
+  margin: 0 0 3px;
+}
+.docDest {
+  font-size: 11px;
+  color: #B4B2A9;
+  margin: 0;
+}
+
+/* ── Section 6: Social Proof ─────────────────────────────────── */
+.socialSection {
+  background: #FAFAFA;
+  border-top: 1px solid #F1EFE8;
+  border-bottom: 1px solid #F1EFE8;
+  padding: 64px 32px;
+}
+.socialInner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.statCard {
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 10px;
+  padding: 20px;
+}
+.statNumber {
+  font-size: 28px;
+  font-weight: 500;
+  color: #1B3A5C;
+  margin: 0 0 4px;
+}
+.statLabel {
+  font-size: 13px;
+  color: #888780;
+  line-height: 1.4;
+  margin: 0;
+}
+.testimonialsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.testimonialCard {
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 10px;
+  padding: 20px;
+}
+.testimonialQuote {
+  font-size: 13px;
+  color: #444441;
+  line-height: 1.7;
+  font-style: italic;
+  margin: 0 0 16px;
+}
+.testimonialAuthor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.testimonialAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.testimonialName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1B3A5C;
+  margin: 0;
+  line-height: 1.3;
+}
+.testimonialMeta {
+  font-size: 11px;
+  color: #888780;
+  margin: 2px 0 0;
+}
+
+/* ── Section 7: Pricing ──────────────────────────────────────── */
+.pricingSection {
+  background: #fff;
+  padding: 64px 32px;
+}
+.pricingInner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.pricingSubtitle {
+  font-size: 15px;
+  color: #888780;
+  margin: 0 0 32px;
+  line-height: 1.6;
+}
+.packsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.packCard {
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+}
+.packCardFeatured { border: 1.5px solid #185FA5; }
+.packBadge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #185FA5;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+.packName {
+  font-size: 12px;
+  color: #888780;
+  margin: 0 0 6px;
+  font-weight: 500;
+}
+.packPrice {
+  font-size: 22px;
+  font-weight: 500;
+  color: #1B3A5C;
+  margin: 0 0 2px;
+}
+.packCredits {
+  font-size: 12px;
+  color: #888780;
+  margin: 0 0 16px;
+}
+.packBtn {
+  width: 100%;
+  padding: 9px;
+  border-radius: 7px;
+  font-size: 13px;
+  border: 1px solid #D3D1C7;
+  background: #fff;
+  color: #1B3A5C;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.packBtn:hover { background: #F5F4F0; }
+.packBtnFeatured {
+  background: #1B3A5C;
+  color: #fff;
+  border: none;
+}
+.packBtnFeatured:hover { background: #185FA5; }
+.pricingNote {
+  text-align: center;
+  font-size: 13px;
+  color: #888780;
+  margin: 0;
+}
+.pricingNoteLink {
+  color: #185FA5;
+  text-decoration: none;
+  font-weight: 500;
+}
+.pricingNoteLink:hover { text-decoration: underline; }
+
+/* ── Section 8: Final CTA ────────────────────────────────────── */
+.finalCtaSection { padding: 0 32px 64px; }
+.finalCtaCard {
+  background: #1B3A5C;
+  border-radius: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 72px 32px;
+  text-align: center;
+}
+.finalCtaH2 {
+  font-size: 28px;
+  font-weight: 500;
+  color: #fff;
+  margin: 0 0 12px;
+}
+.finalCtaP {
+  font-size: 16px;
+  color: #B5D4F4;
+  margin: 0 0 32px;
+}
+.finalCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  color: #1B3A5C;
+  border: none;
+  padding: 13px 32px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.finalCtaBtn:hover { background: #F0F4F8; }
+.finalCtaNote {
+  font-size: 12px;
+  color: #85B7EB;
+  margin: 14px 0 0;
+}
+
+/* ── Section 9: Footer ───────────────────────────────────────── */
+.footer {
+  background: #fff;
+  border-top: 1px solid #F1EFE8;
+  padding: 32px;
+}
+.footerInner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footerLogo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.footerLogoMark {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #1B3A5C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.footerLogoText {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1B3A5C;
+}
+.footerLinks {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.footerLink {
+  font-size: 13px;
+  color: #888780;
+  text-decoration: none;
+  transition: color 0.15s;
+  cursor: pointer;
+}
+.footerLink:hover { color: #1B3A5C; }
+.footerCopy {
+  font-size: 12px;
+  color: #B4B2A9;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .heroSection { padding: 40px 20px 0; }
+  .heroInner { grid-template-columns: 1fr; gap: 32px; }
+  .heroRight { order: -1; }
+  .carousel { aspect-ratio: 16 / 9; }
+  .carouselArrow { display: none !important; }
+
+  .trustBar { padding: 14px 20px; }
+  .trustBarInner { gap: 16px; justify-content: flex-start; }
+
+  .whySection { padding: 48px 20px; }
+  .compGrid { grid-template-columns: 1fr; }
+
+  .howSection { padding: 48px 20px; }
+  .stepsGrid { grid-template-columns: 1fr; }
+
+  .docsSection { padding: 48px 20px; }
+  .docsGrid { grid-template-columns: 1fr; }
+
+  .socialSection { padding: 48px 20px; }
+  .statsGrid { grid-template-columns: 1fr; }
+  .testimonialsGrid { grid-template-columns: 1fr; }
+
+  .pricingSection { padding: 48px 20px; }
+  .packsGrid { grid-template-columns: 1fr 1fr; }
+
+  .finalCtaSection { padding: 0 20px 48px; }
+  .finalCtaCard { padding: 48px 24px; }
+  .finalCtaH2 { font-size: 22px; }
+
+  .footer { padding: 24px 20px; }
+  .footerInner { flex-direction: column; align-items: flex-start; }
+  .footerLinks { gap: 12px; }
+}
+
+@media (max-width: 480px) {
+  .packsGrid { grid-template-columns: 1fr; }
+}

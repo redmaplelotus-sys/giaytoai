@@ -29,7 +29,10 @@ const vi = {
     pricing: "Bảng giá",
     settings: "Cài đặt",
     signOut: "Đăng xuất",
-    credits: "{count} tài liệu còn lại",
+    credits: "{count} lượt còn lại",
+    noCredits: "Hết lượt",
+    signIn: "Đăng nhập",
+    tryFree: "Dùng thử miễn phí",
   },
   auth: {
     signIn: {

@@ -31,7 +31,10 @@ const ko: Translations = {
     pricing: "요금제",
     settings: "설정",
     signOut: "로그아웃",
-    credits: "남은 서류 {count}개",
+    credits: "{count}회 남음",
+    noCredits: "이용권 없음",
+    signIn: "로그인",
+    tryFree: "무료로 시작",
   },
   auth: {
     signIn: {

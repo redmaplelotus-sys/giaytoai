@@ -41,3 +41,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .claude/
+
+# landing page images (drop real photos here; committed placeholder keeps folder)
+/public/images/*.jpg
+/public/images/*.jpeg
+/public/images/*.png
+/public/images/*.webp
+/public/images/*.avif

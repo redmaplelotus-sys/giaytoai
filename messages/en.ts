@@ -31,7 +31,10 @@ const en: Translations = {
     pricing: "Pricing",
     settings: "Settings",
     signOut: "Sign out",
-    credits: "{count} documents remaining",
+    credits: "{count} left",
+    noCredits: "No credits",
+    signIn: "Sign in",
+    tryFree: "Try for free",
   },
   auth: {
     signIn: {
