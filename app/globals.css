@@ -60,8 +60,15 @@ body {
   padding-left: 32px;
   padding-right: 32px;
 }
+.page-container-wide {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-left: 32px;
+  padding-right: 32px;
+}
 @media (max-width: 640px) {
   .page-container { padding-left: 20px; padding-right: 20px; }
+  .page-container-wide { padding-left: 20px; padding-right: 20px; }
 }
 
 /* ── App header ─────────────────────────────────────────────────────── */

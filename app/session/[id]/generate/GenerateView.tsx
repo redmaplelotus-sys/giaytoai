@@ -285,7 +285,7 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
     : activeRevision?.quality;
 
   return (
-    <div className="page-container space-y-4 py-10">
+    <div className="page-container-wide space-y-4 py-10">
 
       {/* ── Top toolbar ── */}
       <div className="flex items-center justify-between gap-3">
