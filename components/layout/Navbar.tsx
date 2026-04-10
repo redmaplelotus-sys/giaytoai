@@ -265,6 +265,13 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-2 shrink-0 ml-auto">
           {isLoaded && isSignedIn && (
             <>
+              <Link
+                href="/dashboard/new"
+                className="btn-primary"
+                style={{ fontSize: 13, padding: "6px 14px" }}
+              >
+                {t("createDoc")}
+              </Link>
               <CreditPill />
               <UserButton />
             </>
@@ -338,18 +345,25 @@ export function Navbar() {
             <div
               style={{
                 marginTop: 8,
-                paddingTop: 12,
                 borderTop: "1px solid var(--color-border-subtle)",
+                paddingTop: 12,
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "12px 12px 4px",
+                flexDirection: "column",
+                gap: 8,
               }}
             >
-              <span style={{ fontSize: 13, color: "var(--color-text-muted)" }}>
-                {t("settings")}
-              </span>
-              <UserButton />
+              <Link
+                href="/dashboard/new"
+                className="btn-primary w-full"
+                style={{ fontSize: 14, padding: "10px 12px", textAlign: "center" }}
+                onClick={() => setMobileOpen(false)}
+              >
+                {t("createDoc")}
+              </Link>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 4px" }}>
+                <span style={{ fontSize: 13, color: "var(--color-text-muted)" }}>{t("settings")}</span>
+                <UserButton />
+              </div>
             </div>
           )}
 

@@ -35,6 +35,7 @@ const en: Translations = {
     noCredits: "No credits",
     signIn: "Sign in",
     tryFree: "Try for free",
+    createDoc: "Create document",
   },
   auth: {
     signIn: {

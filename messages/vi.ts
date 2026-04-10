@@ -33,6 +33,7 @@ const vi = {
     noCredits: "Hết lượt",
     signIn: "Đăng nhập",
     tryFree: "Dùng thử miễn phí",
+    createDoc: "Tạo tài liệu",
   },
   auth: {
     signIn: {

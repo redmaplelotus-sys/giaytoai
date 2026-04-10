@@ -35,6 +35,7 @@ const ko: Translations = {
     noCredits: "이용권 없음",
     signIn: "로그인",
     tryFree: "무료로 시작",
+    createDoc: "문서 만들기",
   },
   auth: {
     signIn: {

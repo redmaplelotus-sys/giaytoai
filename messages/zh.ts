@@ -35,6 +35,7 @@ const zh: Translations = {
     noCredits: "次数已用完",
     signIn: "登录",
     tryFree: "免费试用",
+    createDoc: "创建文件",
   },
   auth: {
     signIn: {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import styles from "@/app/LandingPage.module.css";
 
 // ---------------------------------------------------------------------------
@@ -105,6 +106,9 @@ export function DocumentsSection() {
                 <p className={styles.docName}>{doc.name}</p>
                 <p className={styles.docDesc}>{doc.desc}</p>
                 {doc.dest && <p className={styles.docDest}>{doc.dest}</p>}
+                <Link href="/dashboard/new" className={styles.docCardLink}>
+                  Tạo <span aria-hidden="true">→</span>
+                </Link>
               </div>
             </div>
           ))}
