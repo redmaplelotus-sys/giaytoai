@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
 import { getUserSessions } from "@/lib/db/sessions";
 import { SessionList } from "./SessionList";
 
@@ -18,12 +19,15 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-semibold tracking-tight">
           Document history
         </h1>
-        <Link
-          href="/dashboard/new"
-          className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200 transition-colors"
-        >
-          + New document
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard/new"
+            className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200 transition-colors"
+          >
+            + New document
+          </Link>
+          <UserButton afterSignOutUrl="/sign-in" />
+        </div>
       </div>
 
       <SessionList sessions={sessions} />
