@@ -159,7 +159,7 @@ export default function NewSessionPage() {
   };
 
   return (
-    <main className="space-y-8" style={{ width: "100%", maxWidth: 1400, marginLeft: "auto", marginRight: "auto", paddingTop: 40, paddingBottom: 40, paddingLeft: "clamp(20px, 4vw, 64px)", paddingRight: "clamp(20px, 4vw, 64px)" }}>
+    <main className="page-container space-y-8" style={{ paddingTop: 40, paddingBottom: 40 }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-text-primary)", letterSpacing: "-0.02em" }}>
         {t("heading")}
       </h1>
