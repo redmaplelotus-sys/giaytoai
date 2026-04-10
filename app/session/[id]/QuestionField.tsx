@@ -1,13 +1,17 @@
 "use client";
 
+import type { AnswerSource } from "@/lib/session/answers";
+
 // ---------------------------------------------------------------------------
-// Source badge
+// Re-export so existing imports of FieldSource keep working during migration.
+// Prefer importing AnswerSource directly from @/lib/session/answers.
 // ---------------------------------------------------------------------------
 
-export type FieldSource = "extracted" | "confirm" | "missing";
+/** @deprecated Use AnswerSource from @/lib/session/answers */
+export type FieldSource = AnswerSource;
 
 const BADGE: Record<
-  FieldSource,
+  AnswerSource,
   { label: string; icon: string; className: string }
 > = {
   missing: {
@@ -22,7 +26,7 @@ const BADGE: Record<
       "rounded-full bg-amber-50 px-1.5 py-0.5 text-amber-600 ring-1 ring-amber-200 " +
       "dark:bg-amber-900/20 dark:text-amber-400 dark:ring-amber-800",
   },
-  confirm: {
+  user: {
     icon: "✓",
     label: "Saved",
     className:
@@ -49,16 +53,16 @@ function SourceBadge({ source }: { source: FieldSource }) {
 // Border and ring by source
 // ---------------------------------------------------------------------------
 
-const BORDER: Record<FieldSource, string> = {
+const BORDER: Record<AnswerSource, string> = {
   missing:   "border-red-200   dark:border-red-900",
   extracted: "border-amber-300 dark:border-amber-700",
-  confirm:   "border-green-300 dark:border-green-700",
+  user:      "border-green-300 dark:border-green-700",
 };
 
-const FOCUS_RING: Record<FieldSource, string> = {
+const FOCUS_RING: Record<AnswerSource, string> = {
   missing:   "focus:border-red-400   focus:ring-red-400   dark:focus:border-red-600   dark:focus:ring-red-600",
   extracted: "focus:border-amber-500 focus:ring-amber-500 dark:focus:border-amber-500 dark:focus:ring-amber-500",
-  confirm:   "focus:border-green-500 focus:ring-green-500 dark:focus:border-green-500 dark:focus:ring-green-500",
+  user:      "focus:border-green-500 focus:ring-green-500 dark:focus:border-green-500 dark:focus:ring-green-500",
 };
 
 // ---------------------------------------------------------------------------
@@ -80,7 +84,7 @@ export interface QuestionFieldProps {
   label: string;
   hint?: string;
   value: string;
-  source: FieldSource;
+  source: AnswerSource;
   type?: "text" | "textarea" | "number";
   rows?: number;
   onChange: (value: string) => void;

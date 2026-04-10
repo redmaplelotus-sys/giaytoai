@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { PROMPT_REGISTRY } from "@/lib/prompts/registry";
 import { SYSTEM_FIELDS } from "@/lib/session/field-meta";
-import { extractFromCV } from "@/lib/ai/extract";
+import { extractCVData } from "@/lib/ai/extract-cv";
 
 const MAX_CV_CHARS = 12_000; // ~3,000 tokens — enough for a full CV
 
@@ -65,7 +65,7 @@ export async function POST(
   const template = PROMPT_REGISTRY[slug as keyof typeof PROMPT_REGISTRY];
   const targetFields = template.requiredFields.filter((f) => !SYSTEM_FIELDS.has(f));
 
-  const result = await extractFromCV(cvText, targetFields);
+  const { profile, prefilledAnswers, count } = await extractCVData(cvText, targetFields);
 
-  return NextResponse.json(result);
+  return NextResponse.json({ extracted: prefilledAnswers, count, profile });
 }

@@ -133,8 +133,18 @@
     "subheading": "Thường mất 15–30 giây. Vui lòng không đóng trang.",
     "done": "Tài liệu đã sẵn sàng",
     "revise": "Tạo lại",
+    "newVersion": "Phiên bản mới",
+    "saveVersion": "Lưu phiên bản",
+    "saving": "Đang lưu…",
     "revisePrompt": "Bạn muốn thay đổi điều gì?",
-    "creditsUsed": "Đã sử dụng 1 tài liệu"
+    "creditsUsed": "Đã sử dụng 1 tài liệu",
+    "abort": "Dừng",
+    "ttft": "Token đầu tiên:",
+    "totalTime": "Tổng:",
+    "translateToggle": "Dịch tiếng Việt",
+    "translateHide": "Ẩn bản dịch",
+    "translating": "Đang dịch…",
+    "translateError": "Dịch thất bại. Vui lòng thử lại."
   },
 
   "quality": {

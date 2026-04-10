@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "app/api/sessions/[id]/upload-cv/route.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "app/api/sessions/[id]/generate/route.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  }
+}

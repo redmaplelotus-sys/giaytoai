@@ -37,13 +37,15 @@ export async function completeDraft(
 export async function updateDraftQuality(
   draftId: string,
   score: 1 | 2 | 3 | 4 | 5,
+  qualityData?: Record<string, unknown>,
   feedback?: string,
 ) {
   const { error } = await supabaseAdmin
     .from("drafts")
     .update({
       quality_score: score,
-      ...(feedback !== undefined && { quality_feedback: feedback }),
+      ...(qualityData !== undefined && { quality_data: qualityData }),
+      ...(feedback    !== undefined && { quality_feedback: feedback }),
     })
     .eq("id", draftId);
   if (error) throw error;
@@ -63,7 +65,7 @@ export async function getDraft(draftId: string) {
 export async function getDraftQuality(draftId: string) {
   const { data, error } = await supabaseAdmin
     .from("drafts")
-    .select("id, quality_score, quality_feedback")
+    .select("id, quality_score, quality_feedback, quality_data")
     .eq("id", draftId)
     .single();
   if (error) throw error;

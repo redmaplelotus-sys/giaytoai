@@ -56,8 +56,9 @@ export async function updateSessionStatus(
 }
 
 /** Returns sessions for the document history page, newest first.
- *  Joins document_types so the UI can display the type name without
- *  a second query. Defaults to the 50 most recent sessions.
+ *  Includes the joined document type, all draft IDs (for "continue" links),
+ *  and all export records (for re-download). Callers pick the latest draft/
+ *  export by sorting the returned arrays. Defaults to the 50 most recent.
  */
 export async function getUserSessions(
   userId: string,
@@ -70,10 +71,10 @@ export async function getUserSessions(
       id,
       status,
       answers,
-      scheduled_at,
       created_at,
-      updated_at,
-      document_types ( id, slug, name_vi, name_en )
+      document_types ( slug, name_en, name_vi ),
+      drafts ( id, created_at ),
+      exports ( id, format, r2_key, created_at )
       `,
     )
     .eq("user_id", userId)

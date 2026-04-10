@@ -1,62 +1,40 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 import { PROMPT_REGISTRY } from "@/lib/prompts/registry";
 import { SYSTEM_FIELDS } from "@/lib/session/field-meta";
-import { extractFromCV } from "@/lib/ai/extract";
+import { extractCVData } from "@/lib/ai/extract-cv";
+import { extractText } from "@/lib/extract-text";
+import { uploadToR2, r2Key } from "@/lib/r2";
+
+// ---------------------------------------------------------------------------
+// Route segment config — Vercel serverless function limits.
+// Memory (1024 MB) is set in vercel.json; maxDuration covers the 60 s cap.
+// ---------------------------------------------------------------------------
+export const maxDuration = 60;
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
 
-// ---------------------------------------------------------------------------
-// Basic PDF text extraction — no dependencies required.
-// Works on PDFs with uncompressed text streams (Word exports, most CV tools).
-// Returns empty string for image-only or compressed PDFs.
-// ---------------------------------------------------------------------------
-function extractPdfText(buffer: Buffer): string {
-  // Decode as latin1 so every byte is preserved as a character
-  const raw = buffer.toString("latin1");
-  const parts: string[] = [];
+const ALLOWED_MIME: Record<string, string> = {
+  ".pdf":  "application/pdf",
+  ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".txt":  "text/plain",
+  ".md":   "text/markdown",
+};
 
-  // Match Tj / ' / " operators (single string argument)
-  const tjRe = /\(([^)\\]*(?:\\.[^)\\]*)*)\)\s*(?:Tj|T'|")/g;
-  let m: RegExpExecArray | null;
-  while ((m = tjRe.exec(raw)) !== null) {
-    const s = decodePdfString(m[1]);
-    if (s.trim()) parts.push(s.trim());
-  }
-
-  // Match TJ operator (array of strings and number kerning adjustments)
-  const tjArrRe = /\[([^\]]*)\]\s*TJ/g;
-  while ((m = tjArrRe.exec(raw)) !== null) {
-    const inner = m[1];
-    const strRe = /\(([^)\\]*(?:\\.[^)\\]*)*)\)/g;
-    let sm: RegExpExecArray | null;
-    while ((sm = strRe.exec(inner)) !== null) {
-      const s = decodePdfString(sm[1]);
-      if (s.trim()) parts.push(s.trim());
-    }
-  }
-
-  return parts.join(" ").replace(/\s+/g, " ").trim();
-}
-
-function decodePdfString(s: string): string {
-  return s
-    .replace(/\\n/g, " ")
-    .replace(/\\r/g, " ")
-    .replace(/\\t/g, " ")
-    .replace(/\\\\/g, "\\")
-    .replace(/\\\(/g, "(")
-    .replace(/\\\)/g, ")")
-    .replace(/[^\x20-\x7E]/g, " "); // strip non-ASCII
+function resolveContentType(filename: string, declared: string): string | null {
+  const ext = ("." + filename.toLowerCase().split(".").pop()) as keyof typeof ALLOWED_MIME;
+  return ALLOWED_MIME[ext] ?? (declared.startsWith("text/") ? declared : null);
 }
 
 // ---------------------------------------------------------------------------
-// Route handler
+// POST /api/sessions/[id]/upload-cv
 // ---------------------------------------------------------------------------
 
 export async function POST(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { userId } = await auth();
@@ -66,7 +44,10 @@ export async function POST(
 
   const { id: sessionId } = await params;
 
-  // Auth + ownership
+  const rl = await checkRateLimit("upload", userId, request);
+  if (!rl.allowed) return rateLimitResponse(rl);
+
+  // ── Auth + ownership ──────────────────────────────────────────────────────
   const [userResult, sessionResult] = await Promise.all([
     supabaseAdmin.from("users").select("id").eq("clerk_id", userId).single(),
     supabaseAdmin
@@ -82,11 +63,11 @@ export async function POST(
   if (sessionResult.error || !sessionResult.data) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
-  if (sessionResult.data.user_id !== userResult.data.id) {
+  if (sessionResult.data.user_id !== userId) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  // Parse multipart form data
+  // ── Parse form data ───────────────────────────────────────────────────────
   let formData: FormData;
   try {
     formData = await request.formData();
@@ -99,34 +80,70 @@ export async function POST(
     return NextResponse.json({ error: "file field is required" }, { status: 422 });
   }
 
+  // ── Validate size ─────────────────────────────────────────────────────────
   if (file.size > MAX_FILE_BYTES) {
     return NextResponse.json({ error: "file_too_large" }, { status: 413 });
   }
 
-  // Extract text by file type
-  const name = file.name.toLowerCase();
-  const isPdf = file.type === "application/pdf" || name.endsWith(".pdf");
-  const isTxt = file.type.startsWith("text/") || name.endsWith(".txt") || name.endsWith(".md");
-
-  if (!isPdf && !isTxt) {
+  // ── Validate type ─────────────────────────────────────────────────────────
+  const contentType = resolveContentType(file.name, file.type);
+  if (!contentType) {
     return NextResponse.json({ error: "unsupported_format" }, { status: 422 });
   }
 
-  let cvText: string;
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  if (isTxt) {
-    cvText = buffer.toString("utf-8");
-  } else {
-    cvText = extractPdfText(buffer);
+  // ── Store to R2 ───────────────────────────────────────────────────────────
+  const key = r2Key("uploads", userId, sessionId, file.name);
+  let r2Error: Error | null = null;
+
+  try {
+    await uploadToR2(key, buffer, contentType);
+  } catch (err) {
+    // R2 failure is non-fatal — we still extract and return data.
+    // The upload record will be omitted if storage failed.
+    r2Error = err instanceof Error ? err : new Error(String(err));
+    console.error("[upload-cv] R2 put failed:", r2Error.message);
   }
 
-  if (cvText.trim().length < 80) {
-    // Likely a scanned/image PDF or encryption
+  // ── Save upload record (only when R2 succeeded) ───────────────────────────
+  let uploadId: string | null = null;
+  if (!r2Error) {
+    const { data: uploadRow, error: uploadErr } = await supabaseAdmin
+      .from("uploads")
+      .insert({
+        session_id: sessionId,
+        user_id:    userId,
+        r2_key:     key,
+        filename:   file.name,
+        mime_type:  contentType,
+        size_bytes: file.size,
+      })
+      .select("id")
+      .single();
+
+    if (uploadErr) {
+      console.error("[upload-cv] DB insert failed:", uploadErr.message);
+    } else {
+      uploadId = uploadRow.id as string;
+    }
+  }
+
+  // ── Extract text ──────────────────────────────────────────────────────────
+  let cvText: string;
+  try {
+    const extracted = await extractText(buffer, file.name);
+    cvText = extracted.text;
+  } catch (err) {
+    console.error("[upload-cv] extractText failed:", err);
     return NextResponse.json({ error: "could_not_read" }, { status: 422 });
   }
 
-  // Resolve target fields from session's doc type
+  if (cvText.trim().length < 80) {
+    return NextResponse.json({ error: "could_not_read" }, { status: 422 });
+  }
+
+  // ── Resolve target fields from session's doc type ─────────────────────────
   const dt = sessionResult.data.document_types;
   const slug = (Array.isArray(dt) ? dt[0] : dt)?.slug as string | undefined;
 
@@ -137,7 +154,16 @@ export async function POST(
   const template = PROMPT_REGISTRY[slug as keyof typeof PROMPT_REGISTRY];
   const targetFields = template.requiredFields.filter((f) => !SYSTEM_FIELDS.has(f));
 
-  const result = await extractFromCV(cvText, targetFields);
+  // ── Run CV extraction ─────────────────────────────────────────────────────
+  const { profile, prefilledAnswers, count } = await extractCVData(cvText, targetFields);
 
-  return NextResponse.json(result);
+  return NextResponse.json({
+    /** Flat answer map — consumed by CvDropZone → AnswersForm.handleExtracted() */
+    extracted: prefilledAnswers,
+    count,
+    /** Structured profile — available for a "what we found" summary card */
+    profile,
+    /** R2 upload record id, null when storage was skipped due to an error */
+    uploadId,
+  });
 }

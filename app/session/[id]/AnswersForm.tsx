@@ -4,12 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useT } from "@/lib/i18n";
 import { getMeta, SYSTEM_FIELDS } from "@/lib/session/field-meta";
-import { QuestionField, type FieldSource } from "./QuestionField";
+import {
+  type AnswerSource,
+  initSource,
+  sourceOnBlur,
+  mergeAnswers,
+} from "@/lib/session/answers";
+import { QuestionField } from "./QuestionField";
 import { CvDropZone } from "./CvDropZone";
-
-function initSource(value: string): FieldSource {
-  return value.trim() ? "extracted" : "missing";
-}
 
 // ---------------------------------------------------------------------------
 // Main form
@@ -41,7 +43,7 @@ export function AnswersForm({
     Object.fromEntries(questions.map((f) => [f, initialAnswers[f] ?? ""])),
   );
 
-  const [sources, setSources] = useState<Record<string, FieldSource>>(() =>
+  const [sources, setSources] = useState<Record<string, AnswerSource>>(() =>
     Object.fromEntries(questions.map((f) => [f, initSource(initialAnswers[f] ?? "")])),
   );
 
@@ -69,9 +71,11 @@ export function AnswersForm({
     [sessionId],
   );
 
-  // Keep a ref so blur handlers always see current answers
+  // Refs so event handlers always read current state without stale closures.
   const answersRef = useRef(answers);
+  const sourcesRef = useRef(sources);
   useEffect(() => { answersRef.current = answers; }, [answers]);
+  useEffect(() => { sourcesRef.current = sources; }, [sources]);
 
   function handleChange(field: string, value: string) {
     setAnswers((prev) => ({ ...prev, [field]: value }));
@@ -80,32 +84,25 @@ export function AnswersForm({
 
   function handleBlur(field: string) {
     const value = answersRef.current[field] ?? "";
-    setSources((prev) => ({
-      ...prev,
-      [field]: value.trim() ? "confirm" : "missing",
-    }));
+    setSources((prev) => ({ ...prev, [field]: sourceOnBlur(value) }));
     saveToDb(answersRef.current);
   }
 
-  // Called when CV extraction completes — bulk-apply extracted values
+  // Called when CV extraction completes — only fills empty slots.
   function handleExtracted(extracted: Record<string, string>) {
-    setAnswers((prev) => {
-      const next = { ...prev };
-      for (const [k, v] of Object.entries(extracted)) {
-        if (questions.includes(k)) next[k] = v;
-      }
-      return next;
-    });
-    setSources((prev) => {
-      const next = { ...prev };
-      for (const k of Object.keys(extracted)) {
-        if (questions.includes(k)) next[k] = "extracted";
-      }
-      return next;
-    });
-    // Save all extracted values to DB at once
-    const merged = { ...answersRef.current, ...extracted };
-    saveToDb(merged);
+    const relevant = Object.fromEntries(
+      Object.entries(extracted).filter(([k]) => questions.includes(k)),
+    );
+
+    const { answers: nextAnswers, sources: nextSources } = mergeAnswers(
+      answersRef.current,
+      sourcesRef.current,
+      relevant,
+    );
+
+    setAnswers(nextAnswers);
+    setSources(nextSources);
+    saveToDb(nextAnswers);
   }
 
   // Progress

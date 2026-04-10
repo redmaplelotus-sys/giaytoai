@@ -14,7 +14,7 @@ type UploadState =
   | { phase: "done"; count: number }
   | { phase: "error"; code: "generic" | "format" | "read" | "size" };
 
-const ACCEPT = ".pdf,.txt,.md,text/plain,application/pdf";
+const ACCEPT = ".pdf,.docx,.txt,.md,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_MB = 5;
 const MAX_BYTES = MAX_MB * 1024 * 1024;
 
@@ -63,9 +63,10 @@ export function CvDropZone({ sessionId, onExtracted }: CvDropZoneProps) {
     }
 
     const name = file.name.toLowerCase();
-    const isPdf = file.type === "application/pdf" || name.endsWith(".pdf");
-    const isTxt = file.type.startsWith("text/") || name.endsWith(".txt") || name.endsWith(".md");
-    if (!isPdf && !isTxt) {
+    const isPdf  = file.type === "application/pdf" || name.endsWith(".pdf");
+    const isDocx = name.endsWith(".docx") || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    const isTxt  = file.type.startsWith("text/") || name.endsWith(".txt") || name.endsWith(".md");
+    if (!isPdf && !isDocx && !isTxt) {
       setState({ phase: "error", code: "format" });
       return;
     }

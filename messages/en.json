@@ -133,8 +133,18 @@
     "subheading": "Usually takes 15–30 seconds. Please don't close this page.",
     "done": "Document ready",
     "revise": "Regenerate",
+    "newVersion": "New version",
+    "saveVersion": "Save version",
+    "saving": "Saving…",
     "revisePrompt": "What would you like to change?",
-    "creditsUsed": "1 document used"
+    "creditsUsed": "1 document used",
+    "abort": "Stop",
+    "ttft": "First token:",
+    "totalTime": "Total:",
+    "translateToggle": "Translate",
+    "translateHide": "Hide translation",
+    "translating": "Translating…",
+    "translateError": "Translation failed. Please try again."
   },
 
   "quality": {
