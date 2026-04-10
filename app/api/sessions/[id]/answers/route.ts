@@ -25,33 +25,22 @@ export async function PATCH(
     return NextResponse.json({ error: "answers must be an object" }, { status: 422 });
   }
 
-  // Verify ownership: resolve clerk_id → user UUID, check session.user_id
-  const [userResult, sessionResult] = await Promise.all([
-    supabaseAdmin
-      .from("users")
-      .select("id")
-      .eq("clerk_id", userId)
-      .single(),
-    supabaseAdmin
-      .from("sessions")
-      .select("user_id, answers")
-      .eq("id", sessionId)
-      .single(),
-  ]);
+  const { data: sessionData, error: sessionError } = await supabaseAdmin
+    .from("sessions")
+    .select("user_id, answers")
+    .eq("id", sessionId)
+    .single();
 
-  if (userResult.error || !userResult.data) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
-  if (sessionResult.error || !sessionResult.data) {
+  if (sessionError || !sessionData) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
-  if (sessionResult.data.user_id !== userResult.data.id) {
+  if (sessionData.user_id !== userId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   // Merge: keep existing answers, overwrite only provided keys
   const merged = {
-    ...(sessionResult.data.answers as Record<string, unknown> ?? {}),
+    ...(sessionData.answers as Record<string, unknown> ?? {}),
     ...(incoming as Record<string, unknown>),
   };
 

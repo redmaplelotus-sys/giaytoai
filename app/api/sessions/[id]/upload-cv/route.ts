@@ -48,22 +48,16 @@ export async function POST(
   if (!rl.allowed) return rateLimitResponse(rl);
 
   // ── Auth + ownership ──────────────────────────────────────────────────────
-  const [userResult, sessionResult] = await Promise.all([
-    supabaseAdmin.from("users").select("id").eq("clerk_id", userId).single(),
-    supabaseAdmin
-      .from("sessions")
-      .select("user_id, document_types(slug)")
-      .eq("id", sessionId)
-      .single(),
-  ]);
+  const { data: sessionData, error: sessionError } = await supabaseAdmin
+    .from("sessions")
+    .select("user_id, document_types(slug)")
+    .eq("id", sessionId)
+    .single();
 
-  if (userResult.error || !userResult.data) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
-  if (sessionResult.error || !sessionResult.data) {
+  if (sessionError || !sessionData) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
-  if (sessionResult.data.user_id !== userId) {
+  if (sessionData.user_id !== userId) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
@@ -144,7 +138,7 @@ export async function POST(
   }
 
   // ── Resolve target fields from session's doc type ─────────────────────────
-  const dt = sessionResult.data.document_types;
+  const dt = sessionData.document_types;
   const slug = (Array.isArray(dt) ? dt[0] : dt)?.slug as string | undefined;
 
   if (!slug || !(slug in PROMPT_REGISTRY)) {

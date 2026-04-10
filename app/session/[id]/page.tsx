@@ -1,6 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect, notFound } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabase-admin";
 import { getSession } from "@/lib/db/sessions";
 import { PROMPT_REGISTRY } from "@/lib/prompts/registry";
 import { AnswersForm } from "./AnswersForm";
@@ -14,18 +13,10 @@ export default async function SessionPage({
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  // Resolve clerk_id → internal UUID and fetch session in parallel
-  const [userResult, session] = await Promise.all([
-    supabaseAdmin
-      .from("users")
-      .select("id")
-      .eq("clerk_id", userId)
-      .single(),
-    getSession(id).catch(() => null),
-  ]);
+  const session = await getSession(id).catch(() => null);
 
-  if (!session || !userResult.data) notFound();
-  if (session.user_id !== userResult.data.id) notFound(); // same response as 404 — don't leak existence
+  if (!session) notFound();
+  if (session.user_id !== userId) notFound(); // same response as 404 — don't leak existence
 
   const slug = session.document_types?.slug as string | undefined;
   if (!slug || !(slug in PROMPT_REGISTRY)) notFound();
