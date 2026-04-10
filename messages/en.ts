@@ -122,6 +122,14 @@ const en: Translations = {
     missingFields: "Missing information: {fields}",
     outputLanguage: "Output language",
     outputLanguagePlaceholder: "Select language",
+    saveStatus: {
+      saved: "Saved",
+      saving: "Saving…",
+      error: "Save failed",
+    },
+    progress: "{filled} / {total} questions",
+    generateButton: "Generate document",
+    fieldsRemaining: "{count} remaining",
   },
   outputLanguages: {
     vi: "Vietnamese",

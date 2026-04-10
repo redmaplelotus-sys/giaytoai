@@ -116,6 +116,14 @@ const zh: Translations = {
     missingFields: "缺少信息：{fields}",
     outputLanguage: "输出语言",
     outputLanguagePlaceholder: "请选择语言",
+    saveStatus: {
+      saved: "已保存",
+      saving: "保存中…",
+      error: "保存失败",
+    },
+    progress: "{filled} / {total} 题",
+    generateButton: "生成文件",
+    fieldsRemaining: "还剩 {count} 题",
   },
   outputLanguages: {
     vi: "越南语",

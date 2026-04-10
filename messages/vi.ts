@@ -117,6 +117,14 @@ const vi = {
     missingFields: "Thiếu thông tin: {fields}",
     outputLanguage: "Ngôn ngữ đầu ra",
     outputLanguagePlaceholder: "Chọn ngôn ngữ",
+    saveStatus: {
+      saved: "Đã lưu",
+      saving: "Đang lưu…",
+      error: "Lưu thất bại",
+    },
+    progress: "{filled} / {total} câu hỏi",
+    generateButton: "Tạo tài liệu",
+    fieldsRemaining: "Còn {count} câu chưa điền",
   },
   outputLanguages: {
     vi: "Tiếng Việt",

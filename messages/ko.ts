@@ -117,6 +117,14 @@ const ko: Translations = {
     missingFields: "누락된 정보: {fields}",
     outputLanguage: "출력 언어",
     outputLanguagePlaceholder: "언어 선택",
+    saveStatus: {
+      saved: "저장됨",
+      saving: "저장 중…",
+      error: "저장 실패",
+    },
+    progress: "{filled} / {total} 문항",
+    generateButton: "서류 생성",
+    fieldsRemaining: "{count}개 남음",
   },
   outputLanguages: {
     vi: "베트남어",
