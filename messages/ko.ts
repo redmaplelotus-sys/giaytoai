@@ -200,6 +200,28 @@ const ko: Translations = {
     mostPopular: "가장 인기",
     paymentMethods: "VNPay, Momo 또는 국제 카드로 결제",
   },
+  newSession: {
+    heading: "새 서류",
+    goalHeading: "어떤 서류가 필요하신가요?",
+    goals: {
+      study: "유학",
+      job: "취업",
+      immigration: "이민",
+      business: "비즈니스",
+    },
+    goalDescriptions: {
+      study: "자기소개서, 지원 동기서, 장학금 에세이",
+      job: "커버 레터, 추천서",
+      immigration: "공식 서류 번역",
+      business: "커버 레터, 지원 동기서",
+    },
+    destinationHeading: "목적지",
+    outputLangHeading: "서류 언어",
+    wordCountLabel: "목표 단어 수",
+    wordCountHint: "비워두면 서류 유형의 기본값이 사용됩니다",
+    resolvedType: "서류 유형: {type}",
+    continueButton: "계속",
+  },
   errors: {
     generic: "오류가 발생했습니다. 다시 시도해 주세요.",
     unauthorized: "이 작업을 수행하려면 로그인이 필요합니다.",

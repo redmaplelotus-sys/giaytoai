@@ -205,6 +205,28 @@ const en: Translations = {
     mostPopular: "Most popular",
     paymentMethods: "Pay with VNPay, Momo, or international card",
   },
+  newSession: {
+    heading: "New document",
+    goalHeading: "What do you need?",
+    goals: {
+      study: "Study abroad",
+      job: "Find a job",
+      immigration: "Immigration",
+      business: "Business",
+    },
+    goalDescriptions: {
+      study: "Personal statement, motivation letter, scholarship essay",
+      job: "Cover letter, reference letter",
+      immigration: "Official document translation",
+      business: "Cover letter, motivation letter",
+    },
+    destinationHeading: "Destination",
+    outputLangHeading: "Document language",
+    wordCountLabel: "Target word count",
+    wordCountHint: "Leave blank to use the document type default",
+    resolvedType: "Document type: {type}",
+    continueButton: "Continue",
+  },
   errors: {
     generic: "An error occurred. Please try again.",
     unauthorized: "You need to sign in to do that.",

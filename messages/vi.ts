@@ -204,6 +204,28 @@ const vi = {
     mostPopular: "Phổ biến nhất",
     paymentMethods: "Thanh toán qua VNPay, Momo, thẻ quốc tế",
   },
+  newSession: {
+    heading: "Tạo tài liệu mới",
+    goalHeading: "Bạn cần tài liệu gì?",
+    goals: {
+      study: "Du học",
+      job: "Xin việc",
+      immigration: "Di trú",
+      business: "Kinh doanh",
+    },
+    goalDescriptions: {
+      study: "Personal statement, motivation letter, học bổng",
+      job: "Cover letter, thư giới thiệu",
+      immigration: "Dịch tài liệu chính thức",
+      business: "Cover letter, motivation letter",
+    },
+    destinationHeading: "Quốc gia đích",
+    outputLangHeading: "Ngôn ngữ tài liệu",
+    wordCountLabel: "Số từ mục tiêu",
+    wordCountHint: "Để trống để dùng mặc định của loại tài liệu",
+    resolvedType: "Loại tài liệu: {type}",
+    continueButton: "Tiếp tục",
+  },
   errors: {
     generic: "Đã xảy ra lỗi. Vui lòng thử lại.",
     unauthorized: "Bạn cần đăng nhập để thực hiện thao tác này.",

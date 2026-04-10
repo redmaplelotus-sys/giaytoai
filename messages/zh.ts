@@ -199,6 +199,28 @@ const zh: Translations = {
     mostPopular: "最受欢迎",
     paymentMethods: "支持 VNPay、Momo 或国际信用卡付款",
   },
+  newSession: {
+    heading: "新建文件",
+    goalHeading: "您需要什么文件？",
+    goals: {
+      study: "留学申请",
+      job: "求职",
+      immigration: "移民",
+      business: "商务",
+    },
+    goalDescriptions: {
+      study: "个人陈述、动机信、奖学金文章",
+      job: "求职信、推荐信",
+      immigration: "官方文件翻译",
+      business: "求职信、动机信",
+    },
+    destinationHeading: "目的地",
+    outputLangHeading: "文件语言",
+    wordCountLabel: "目标字数",
+    wordCountHint: "留空则使用该文件类型的默认字数",
+    resolvedType: "文件类型：{type}",
+    continueButton: "继续",
+  },
   errors: {
     generic: "发生错误，请重试。",
     unauthorized: "请先登录后再执行此操作。",
