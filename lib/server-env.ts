@@ -42,15 +42,15 @@ export const serverEnv = {
   payosApiKey:      optionalEnv("PAYOS_API_KEY"),
   payosChecksumKey: optionalEnv("PAYOS_CHECKSUM_KEY"),
 
-  // Cloudflare R2 — required (exports and uploads won't work without it)
-  cfAccountId:          requireEnv("CF_ACCOUNT_ID"),
-  cfR2AccessKeyId:      requireEnv("CF_R2_ACCESS_KEY_ID"),
-  cfR2SecretAccessKey:  requireEnv("CF_R2_SECRET_ACCESS_KEY"),
-  cfR2BucketName:       requireEnv("CF_R2_BUCKET_NAME"),
+  // Cloudflare R2 — optional (exports/uploads return errors when unset)
+  cfAccountId:          optionalEnv("CF_ACCOUNT_ID"),
+  cfR2AccessKeyId:      optionalEnv("CF_R2_ACCESS_KEY_ID"),
+  cfR2SecretAccessKey:  optionalEnv("CF_R2_SECRET_ACCESS_KEY"),
+  cfR2BucketName:       optionalEnv("CF_R2_BUCKET_NAME"),
 
-  // Upstash Redis — required (rate limiting)
-  upstashRedisRestUrl:   requireEnv("UPSTASH_REDIS_REST_URL"),
-  upstashRedisRestToken: requireEnv("UPSTASH_REDIS_REST_TOKEN"),
+  // Upstash Redis — optional (rate limiting bypassed when unset)
+  upstashRedisRestUrl:   optionalEnv("UPSTASH_REDIS_REST_URL"),
+  upstashRedisRestToken: optionalEnv("UPSTASH_REDIS_REST_TOKEN"),
 
   // Resend — optional (email sending fails gracefully when unset)
   resendApiKey:    optionalEnv("RESEND_API_KEY"),
