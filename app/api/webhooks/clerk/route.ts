@@ -1,7 +1,7 @@
 import { Webhook, WebhookRequiredHeaders } from "svix";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { serverEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/server-env";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // Clerk sends these three headers on every webhook delivery.
