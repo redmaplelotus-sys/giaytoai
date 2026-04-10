@@ -26,7 +26,7 @@ export default async function DashboardPage() {
           >
             + New document
           </Link>
-          <UserButton afterSignOutUrl="/sign-in" />
+          <UserButton />
         </div>
       </div>
 
