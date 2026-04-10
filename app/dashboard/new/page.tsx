@@ -159,7 +159,7 @@ export default function NewSessionPage() {
   };
 
   return (
-    <main className="page-container py-10 space-y-8">
+    <main className="page-container-wide py-10 space-y-8">
       <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-text-primary)", letterSpacing: "-0.02em" }}>
         {t("heading")}
       </h1>
