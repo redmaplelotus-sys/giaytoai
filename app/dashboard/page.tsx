@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   const sessions = await getUserSessions(userId);
 
   return (
-    <main className="page-container-wide py-10 space-y-6">
+    <main className="space-y-6" style={{ width: "100%", maxWidth: 1100, marginLeft: "auto", marginRight: "auto", paddingTop: 40, paddingBottom: 40, paddingLeft: "clamp(20px, 4vw, 48px)", paddingRight: "clamp(20px, 4vw, 48px)" }}>
       <div className="flex items-center justify-between">
         <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-text-primary)", letterSpacing: "-0.02em" }}>
           Document history
