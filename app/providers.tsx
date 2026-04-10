@@ -46,7 +46,10 @@ interface ProvidersProps {
 
 export function Providers({ children, locale, messages }: ProvidersProps) {
   return (
-    <ClerkProvider localization={viVN}>
+    <ClerkProvider
+      localization={viVN}
+      appearance={{ variables: { colorBackground: "#ffffff" } }}
+    >
       <SentryUserContext />
       <I18nProvider locale={locale} messages={messages}>
         <PHProvider client={posthog}>

@@ -2,14 +2,32 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function SignInPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 px-4 py-16 bg-zinc-50 dark:bg-black">
-      <div className="max-w-sm w-full text-center space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+    <main
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 32,
+        padding: "64px 16px",
+        background: "#FAFAFA",
+      }}
+    >
+      <div style={{ maxWidth: 360, width: "100%", textAlign: "center" }}>
+        <h1
+          style={{
+            fontSize: 22,
+            fontWeight: 600,
+            color: "#1B3A5C",
+            letterSpacing: "-0.02em",
+            margin: "0 0 8px",
+          }}
+        >
           Chào mừng trở lại
         </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Đăng nhập để tiếp tục soạn thảo hồ sơ du học của bạn với sự hỗ trợ
-          của AI.
+        <p style={{ fontSize: 14, color: "#5F5E5A", margin: 0, lineHeight: 1.6 }}>
+          Đăng nhập để tiếp tục soạn thảo hồ sơ du học của bạn với sự hỗ trợ của AI.
         </p>
       </div>
 

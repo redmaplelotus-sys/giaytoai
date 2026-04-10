@@ -2,23 +2,50 @@ import { SignUp } from "@clerk/nextjs";
 
 export default function SignUpPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 px-4 py-16 bg-zinc-50 dark:bg-black">
-      <div className="max-w-sm w-full space-y-4">
-        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 py-4 space-y-1">
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+    <main
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 32,
+        padding: "64px 16px",
+        background: "#FAFAFA",
+      }}
+    >
+      <div style={{ maxWidth: 360, width: "100%" }}>
+        {/* Free credits banner */}
+        <div
+          style={{
+            borderRadius: 12,
+            border: "1px solid #C0DD97",
+            background: "#EAF3DE",
+            padding: "12px 16px",
+            marginBottom: 20,
+          }}
+        >
+          <p style={{ fontSize: 13, fontWeight: 600, color: "#27500A", margin: "0 0 4px" }}>
             🎁 Tặng 2 tài liệu miễn phí khi đăng ký
           </p>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Soạn thảo ngay personal statement, cover letter, hay bài luận học
-            bổng — không cần thẻ tín dụng.
+          <p style={{ fontSize: 13, color: "#3D6012", margin: 0, lineHeight: 1.5 }}>
+            Soạn thảo ngay personal statement, cover letter, hay bài luận học bổng — không cần thẻ tín dụng.
           </p>
         </div>
 
-        <div className="text-center space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <div style={{ textAlign: "center", marginBottom: 8 }}>
+          <h1
+            style={{
+              fontSize: 22,
+              fontWeight: 600,
+              color: "#1B3A5C",
+              letterSpacing: "-0.02em",
+              margin: "0 0 6px",
+            }}
+          >
             Tạo tài khoản
           </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p style={{ fontSize: 14, color: "#5F5E5A", margin: 0, lineHeight: 1.6 }}>
             Bắt đầu hành trình du học cùng Giấy Tờ AI.
           </p>
         </div>
