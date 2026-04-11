@@ -16,7 +16,8 @@ export type RefinementAction =
   | "shorten"
   | "addKeywords"
   | "cultureCheck"
-  | "fixEnglish";
+  | "fixEnglish"
+  | "applyInsight";
 
 /** Actions that produce replacement text streamed into the editor. */
 const REPLACE_ACTIONS = new Set<RefinementAction>([
@@ -25,6 +26,7 @@ const REPLACE_ACTIONS = new Set<RefinementAction>([
   "shorten",
   "addKeywords",
   "fixEnglish",
+  "applyInsight",
 ]);
 
 /** Actions that produce analysis/feedback shown in a separate panel. */
@@ -92,6 +94,9 @@ Pay particular attention to ESL patterns common in Vietnamese-English writing:
 - Run-on sentences and comma splices
 Preserve the applicant's meaning, structure, and specific examples exactly.
 Output: the corrected document only. No preamble, no commentary.`,
+
+  // Populated dynamically from the insight body; placeholder here for the type map.
+  applyInsight: "",
 };
 
 // ---------------------------------------------------------------------------
@@ -165,14 +170,18 @@ export async function POST(
     return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
   }
 
-  const action      = (body as { action?: unknown }).action as RefinementAction | undefined;
-  const currentText = (body as { currentText?: unknown }).currentText;
+  const action           = (body as { action?: unknown }).action as RefinementAction | undefined;
+  const currentText      = (body as { currentText?: unknown }).currentText;
+  const customInstruction = (body as { instruction?: unknown }).instruction;
 
-  if (!action || !ACTION_INSTRUCTIONS[action]) {
+  if (!action || !(action in ACTION_INSTRUCTIONS)) {
     return new Response(JSON.stringify({ error: "Invalid action" }), { status: 422 });
   }
   if (typeof currentText !== "string" || !currentText.trim()) {
     return new Response(JSON.stringify({ error: "currentText is required" }), { status: 422 });
+  }
+  if (action === "applyInsight" && (typeof customInstruction !== "string" || !customInstruction.trim())) {
+    return new Response(JSON.stringify({ error: "instruction is required for applyInsight" }), { status: 422 });
   }
 
   // ── Build prompt ──────────────────────────────────────────────────────────
@@ -183,7 +192,9 @@ export async function POST(
     answers.output_language ? `Output language: ${answers.output_language}` : null,
   ].filter(Boolean).join("\n");
 
-  const instruction = ACTION_INSTRUCTIONS[action];
+  const instruction = action === "applyInsight"
+    ? `Apply the following specific improvement to the document:\n\n${customInstruction as string}\n\nPreserve all other content, structure, and the applicant's voice. Output the revised document only. No preamble, no commentary.`
+    : ACTION_INSTRUCTIONS[action];
 
   const userMessage = [
     "INSTRUCTION",

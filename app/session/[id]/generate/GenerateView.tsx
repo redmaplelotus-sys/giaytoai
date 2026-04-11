@@ -22,6 +22,7 @@ import type { QualityReport } from "@/lib/ai/quality";
 import { PollingQualityBadges } from "@/app/components/QualityBadges";
 import { RefinementToolbar } from "@/app/components/RefinementToolbar";
 import { DocumentToolbar } from "@/app/components/DocumentToolbar";
+import { FeedbackPanel } from "@/components/editor/FeedbackPanel";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -177,7 +178,7 @@ function TranslationPanel({ sessionId, draftText, draftId, onTranslated }: Trans
 // Main component
 // ---------------------------------------------------------------------------
 
-export function GenerateView({ sessionId, targetWordCount }: { sessionId: string; targetWordCount?: number | null }) {
+export function GenerateView({ sessionId, targetWordCount, docTypeSlug = "" }: { sessionId: string; targetWordCount?: number | null; docTypeSlug?: string }) {
   const t = useT("generation");
 
   const [revisions, setRevisions]         = useState<DraftRevision[]>([]);
@@ -457,6 +458,15 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
             activeIndex === revisions.length - 1 ? quality : activeRevision.quality
           }
           showDetail
+        />
+      )}
+
+      {/* ── Feedback panel ── */}
+      {activeRevision && !isStreaming && phase === "complete" && (
+        <FeedbackPanel
+          draftId={activeRevision.id}
+          docTypeSlug={docTypeSlug}
+          editor={editor}
         />
       )}
 

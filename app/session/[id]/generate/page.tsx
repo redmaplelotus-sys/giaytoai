@@ -16,7 +16,7 @@ export default async function GeneratePage({
   // Ownership check — 404 on miss or wrong user
   const { data, error } = await supabaseAdmin
     .from("sessions")
-    .select("id, user_id, answers")
+    .select("id, user_id, answers, document_types(slug)")
     .eq("id", sessionId)
     .single();
 
@@ -26,5 +26,16 @@ export default async function GeneratePage({
   const targetWordCount =
     typeof answers.target_word_count === "number" ? answers.target_word_count : null;
 
-  return <GenerateView sessionId={sessionId} targetWordCount={targetWordCount} />;
+  const dt = Array.isArray(data.document_types)
+    ? data.document_types[0]
+    : data.document_types;
+  const docTypeSlug = (dt?.slug ?? "") as string;
+
+  return (
+    <GenerateView
+      sessionId={sessionId}
+      targetWordCount={targetWordCount}
+      docTypeSlug={docTypeSlug}
+    />
+  );
 }
