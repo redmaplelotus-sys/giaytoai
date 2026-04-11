@@ -297,7 +297,7 @@ export function GenerateView({ sessionId, targetWordCount }: { sessionId: string
     : activeRevision?.quality;
 
   return (
-    <div className="space-y-4" style={{ width: "100%", maxWidth: 1400, marginLeft: "auto", marginRight: "auto", paddingTop: 40, paddingBottom: 40, paddingLeft: "clamp(20px, 4vw, 64px)", paddingRight: "clamp(20px, 4vw, 64px)" }}>
+    <div className="space-y-4" style={{ width: "100%", maxWidth: 1100, marginLeft: "auto", marginRight: "auto", paddingTop: 40, paddingBottom: 40, paddingLeft: "clamp(20px, 4vw, 48px)", paddingRight: "clamp(20px, 4vw, 48px)" }}>
 
       {/* ── Top toolbar ── */}
       <div className="flex items-center justify-between gap-3">
