@@ -61,20 +61,20 @@ function Logo() {
       <Image
         src="/logo.svg"
         alt="Giấy Tờ AI"
-        width={140}
-        height={40}
+        width={180}
+        height={52}
         className="hidden md:block"
-        style={{ height: 36, width: "auto" }}
+        style={{ height: 48, width: "auto" }}
         priority
       />
       {/* Mobile */}
       <Image
         src="/logo.svg"
         alt="Giấy Tờ AI"
-        width={120}
-        height={36}
+        width={150}
+        height={44}
         className="block md:hidden"
-        style={{ height: 32, width: "auto" }}
+        style={{ height: 40, width: "auto" }}
         priority
       />
     </Link>
@@ -199,7 +199,7 @@ export function Navbar() {
     >
       <div
         className="page-container"
-        style={{ display: "flex", alignItems: "center", height: 56, gap: 16 }}
+        style={{ display: "flex", alignItems: "center", height: 64, gap: 16 }}
       >
         {/* Logo */}
         <Logo />
