@@ -40,7 +40,10 @@ export async function GET(
     return NextResponse.json({ error: "Draft not found" }, { status: 404 });
   }
 
-  const quality_scores = data.quality_data ?? null;
+  // quality_data may contain merged feedback insights without a QualityReport.
+  // Only surface it as quality_scores when it has the expected QualityReport shape.
+  const qd = data.quality_data as Record<string, unknown> | null;
+  const quality_scores = qd?.wordCountStatus ? qd : null;
 
   return NextResponse.json(
     { quality_scores },
