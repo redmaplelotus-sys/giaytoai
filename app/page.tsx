@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { HeroCarousel } from "@/components/landing/HeroCarousel";
 import { DocumentsSection } from "@/components/landing/DocumentsSection";
 import { PricingSection } from "@/components/landing/PricingSection";
@@ -313,15 +314,13 @@ function Footer() {
 
         {/* Logo */}
         <Link href="/" className={styles.footerLogo}>
-          <div className={styles.footerLogoMark}>
-            <svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true">
-              <rect x="1" y="1" width="9" height="12" rx="1" fill="white" fillOpacity="0.9" />
-              <line x1="3" y1="4.5" x2="8" y2="4.5" stroke="#1B3A5C" strokeWidth="1" strokeLinecap="round" />
-              <line x1="3" y1="7" x2="6.5" y2="7" stroke="#1B3A5C" strokeWidth="1" strokeLinecap="round" />
-              <line x1="3" y1="9.5" x2="7.5" y2="9.5" stroke="#1B3A5C" strokeWidth="1" strokeLinecap="round" />
-            </svg>
-          </div>
-          <span className={styles.footerLogoText}>Giấy Tờ AI</span>
+          <Image
+            src="/logo.svg"
+            alt="Giấy Tờ AI"
+            width={100}
+            height={28}
+            style={{ height: 24, width: "auto" }}
+          />
         </Link>
 
         {/* Nav links */}

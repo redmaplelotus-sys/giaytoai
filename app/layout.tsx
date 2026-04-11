@@ -15,11 +15,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Giấy Tờ AI",
-  description: "Soạn thảo hồ sơ du học bằng AI",
+  title: "Giấy Tờ AI — Tài liệu quốc tế chuyên nghiệp",
+  description: "Tạo personal statement, cover letter và tài liệu visa bằng tiếng Việt trong 5 phút",
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo.svg",
+    apple: "/logo.svg",
+  },
+  openGraph: {
+    title: "Giấy Tờ AI",
+    description: "Tài liệu quốc tế chuyên nghiệp — bằng tiếng Việt",
+    images: ["/logo.svg"],
   },
 };
 

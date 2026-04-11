@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 type SetupState = "loading" | "ready" | "error";
 
@@ -38,7 +39,13 @@ export default function OnboardingPage() {
 
       {state === "ready" && (
         <div className="max-w-sm w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-8 py-10 text-center space-y-4">
-          <div className="text-4xl">🎉</div>
+          <Image
+            src="/logo.svg"
+            alt="Giấy Tờ AI"
+            width={160}
+            height={48}
+            style={{ height: 44, width: "auto", margin: "0 auto 8px" }}
+          />
           <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
             Chào mừng bạn đến với Giấy Tờ AI!
           </h1>

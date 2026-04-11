@@ -59,22 +59,20 @@ function Logo() {
     <Link href="/" className="shrink-0" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
       {/* Desktop */}
       <Image
-        src="/logo.png"
+        src="/logo.svg"
         alt="Giấy Tờ AI"
-        width={0}
-        height={36}
-        sizes="auto"
+        width={140}
+        height={40}
         className="hidden md:block"
         style={{ height: 36, width: "auto" }}
         priority
       />
       {/* Mobile */}
       <Image
-        src="/logo.png"
+        src="/logo.svg"
         alt="Giấy Tờ AI"
-        width={0}
-        height={32}
-        sizes="auto"
+        width={120}
+        height={36}
         className="block md:hidden"
         style={{ height: 32, width: "auto" }}
         priority

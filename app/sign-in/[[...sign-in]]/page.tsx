@@ -1,4 +1,5 @@
 import { SignIn } from "@clerk/nextjs";
+import Image from "next/image";
 
 export default function SignInPage() {
   return (
@@ -15,6 +16,14 @@ export default function SignInPage() {
       }}
     >
       <div style={{ maxWidth: 360, width: "100%", textAlign: "center" }}>
+        <Image
+          src="/logo.svg"
+          alt="Giấy Tờ AI"
+          width={160}
+          height={48}
+          priority
+          style={{ height: 44, width: "auto", marginBottom: 24, display: "inline-block" }}
+        />
         <h1
           style={{
             fontSize: 22,

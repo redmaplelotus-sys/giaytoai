@@ -1,4 +1,5 @@
 import { SignUp } from "@clerk/nextjs";
+import Image from "next/image";
 
 export default function SignUpPage() {
   return (
@@ -15,6 +16,17 @@ export default function SignUpPage() {
       }}
     >
       <div style={{ maxWidth: 360, width: "100%" }}>
+        <div style={{ textAlign: "center", marginBottom: 16 }}>
+          <Image
+            src="/logo.svg"
+            alt="Giấy Tờ AI"
+            width={160}
+            height={48}
+            priority
+            style={{ height: 44, width: "auto", marginBottom: 24, display: "inline-block" }}
+          />
+        </div>
+
         {/* Free credits banner */}
         <div
           style={{
