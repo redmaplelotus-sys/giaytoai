@@ -17,6 +17,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Giấy Tờ AI",
   description: "Soạn thảo hồ sơ du học bằng AI",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 // Locale defaults to Vietnamese. Dynamic per-user locale can be layered on

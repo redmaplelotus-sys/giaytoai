@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useUser, UserButton } from "@clerk/nextjs";
@@ -55,59 +56,29 @@ function CreditPill() {
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2.5 shrink-0" style={{ textDecoration: "none" }}>
-      {/* Navy rounded square icon */}
-      <div
-        style={{
-          width: 34,
-          height: 34,
-          borderRadius: "var(--radius-md)",
-          background: "var(--color-navy)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-          flexShrink: 0,
-        }}
-      >
-        {/* Document lines */}
-        <svg width="18" height="20" viewBox="0 0 18 20" fill="none" aria-hidden="true">
-          <rect x="2" y="1" width="12" height="16" rx="1.5" fill="white" fillOpacity="0.9" />
-          <rect x="4.5" y="5"  width="7" height="1.5" rx="0.75" fill="var(--color-navy)" />
-          <rect x="4.5" y="8"  width="5" height="1.5" rx="0.75" fill="var(--color-navy)" />
-          <rect x="4.5" y="11" width="6" height="1.5" rx="0.75" fill="var(--color-navy)" />
-        </svg>
-        {/* Green checkmark badge */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: -3,
-            right: -3,
-            width: 14,
-            height: 14,
-            borderRadius: "50%",
-            background: "var(--color-green)",
-            border: "2px solid white",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <svg width="7" height="6" viewBox="0 0 7 6" fill="none" aria-hidden="true">
-            <path d="M1 3L2.8 5L6 1" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      </div>
-
-      {/* Text */}
-      <div className="flex flex-col leading-none gap-0.5">
-        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text-primary)", letterSpacing: "-0.01em" }}>
-          Giấy Tờ AI
-        </span>
-        <span style={{ fontSize: 10, color: "var(--color-text-muted)", fontWeight: 500 }}>
-          Tài liệu quốc tế
-        </span>
-      </div>
+    <Link href="/" className="shrink-0" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+      {/* Desktop */}
+      <Image
+        src="/logo.png"
+        alt="Giấy Tờ AI"
+        width={0}
+        height={36}
+        sizes="auto"
+        className="hidden md:block"
+        style={{ height: 36, width: "auto" }}
+        priority
+      />
+      {/* Mobile */}
+      <Image
+        src="/logo.png"
+        alt="Giấy Tờ AI"
+        width={0}
+        height={32}
+        sizes="auto"
+        className="block md:hidden"
+        style={{ height: 32, width: "auto" }}
+        priority
+      />
     </Link>
   );
 }
