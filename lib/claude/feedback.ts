@@ -6,7 +6,7 @@ import { anthropic } from "@/lib/anthropic";
 
 export interface FeedbackInsight {
   id: string;
-  type: "strength" | "improve" | "warning" | "culture";
+  type: "strength" | "improve" | "warning" | "culture" | "note";
   title: string;
   body: string;
   quote?: string;

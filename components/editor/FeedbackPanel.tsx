@@ -9,7 +9,7 @@ import type { FeedbackInsight } from "@/lib/claude/feedback";
 // Types & config
 // ---------------------------------------------------------------------------
 
-type FilterType = "all" | "strength" | "improve" | "warning" | "culture";
+type FilterType = "all" | "strength" | "improve" | "warning" | "culture" | "note";
 
 interface FeedbackPanelProps {
   draftId: string;
@@ -23,6 +23,7 @@ const FILTER_LABELS: Record<FilterType, string> = {
   improve:  "Cải thiện",
   warning:  "Lưu ý",
   culture:  "Văn hóa",
+  note:     "Ghi chú",
 };
 
 const TYPE_COLORS = {
@@ -30,6 +31,7 @@ const TYPE_COLORS = {
   improve:  { bg: "#F0F6FD", border: "#B5D4F4", iconBg: "#E6F1FB", text: "#185FA5", dot: "#185FA5", activeBg: "#E6F1FB", activeColor: "#0C447C", activeBorder: "#B5D4F4", quote: "#185FA5", action: "#185FA5" },
   warning:  { bg: "#FEF8EE", border: "#FAC775", iconBg: "#FAEEDA", text: "#854F0B", dot: "#854F0B", activeBg: "#FAEEDA", activeColor: "#633806", activeBorder: "#FAC775", quote: "#854F0B", action: "#854F0B" },
   culture:  { bg: "#F5F4FF", border: "#AFA9EC", iconBg: "#EEEDFE", text: "#534AB7", dot: "#534AB7", activeBg: "#EEEDFE", activeColor: "#3C3489", activeBorder: "#AFA9EC", quote: "#534AB7", action: "#534AB7" },
+  note:     { bg: "#F7F7F5", border: "#D4D4CE", iconBg: "#EDEDEA", text: "#5F5E5A", dot: "#5F5E5A", activeBg: "#EDEDEA", activeColor: "#3D3D3A", activeBorder: "#D4D4CE", quote: "#5F5E5A", action: "#5F5E5A" },
 };
 
 // ---------------------------------------------------------------------------
@@ -72,6 +74,15 @@ function GlobeIcon({ color }: { color: string }) {
   );
 }
 
+function NoteIcon({ color }: { color: string }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M3.5 2h7a1 1 0 011 1v8a1 1 0 01-1 1h-7a1 1 0 01-1-1V3a1 1 0 011-1z" stroke={color} strokeWidth="1.5" />
+      <path d="M5 5.5h4M5 8h2.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function InfoIcon({ color }: { color: string }) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -90,6 +101,7 @@ function TypeIcon({ type }: { type: FeedbackInsight["type"] }) {
       {type === "improve"  && <ArrowUpIcon color={c.text} />}
       {type === "warning"  && <WarningIcon color={c.text} />}
       {type === "culture"  && <GlobeIcon color={c.text} />}
+      {type === "note"     && <NoteIcon color={c.text} />}
     </div>
   );
 }
@@ -314,7 +326,7 @@ export function FeedbackPanel({ draftId, docTypeSlug, editor }: FeedbackPanelPro
           {/* Right: filter buttons */}
           {!loading && insights.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {(["all", "strength", "improve", "warning", "culture"] as FilterType[]).map((f) => {
+              {(["all", "strength", "improve", "warning", "culture", "note"] as FilterType[]).map((f) => {
                 const count = f === "all" ? insights.length : insights.filter((i) => i.type === f).length;
                 if (count === 0 && f !== "all") return null;
                 const c = f !== "all" ? TYPE_COLORS[f as keyof typeof TYPE_COLORS] : null;

@@ -15,8 +15,8 @@ function parseClaudeNotes(notesText: string): FeedbackInsight[] {
     .filter((l) => l.length > 10)
     .map((note) => ({
       id: crypto.randomUUID(),
-      type: "warning" as const,
-      title: note.length > 55 ? note.slice(0, 55).trimEnd() + "…" : note,
+      type: "note" as const,
+      title: "Ghi chú từ AI",
       body: note,
       actionable: false,
     }));
