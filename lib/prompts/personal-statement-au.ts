@@ -80,8 +80,6 @@ INTERNATIONAL STUDENT CONTEXT
 The applicant is Vietnamese. Australian admissions officers are familiar with Vietnamese school systems (Bằng Tốt Nghiệp THPT, university entrance scores). It is not necessary to explain the Vietnamese education system. Do not translate Vietnamese institution names — use the official Vietnamese name followed by the English translation in parentheses on first mention only.
 
 ---
-
-Return valid JSON only. No text outside the JSON object.
 \
 `;
 

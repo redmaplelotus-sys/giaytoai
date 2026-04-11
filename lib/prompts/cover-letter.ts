@@ -72,8 +72,6 @@ RULES THAT APPLY TO ALL LANGUAGES
 - The highlight achievement ({{highlight_achievement}}) must appear in the body. Do not bury it.
 
 ---
-
-Return valid JSON only. No text outside the JSON object.
 \
 `;
 

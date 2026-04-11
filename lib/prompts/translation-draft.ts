@@ -91,9 +91,7 @@ If {{document_type}} does not match one of the above categories, apply general f
 
 ---
 
-Return valid JSON only. No text outside the JSON object.
-
-The body field must contain the full translated draft, formatted in Markdown. The notes array must list: every institution name translation decision, every ambiguous term with alternatives, and every placeholder inserted.
+After the translated document, append a --- separator followed by a bulleted notes list covering: every institution name translation decision, every ambiguous term with alternatives, and every placeholder inserted.
 \
 `;
 
