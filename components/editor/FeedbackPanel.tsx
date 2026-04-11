@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Editor } from "@tiptap/react";
 import posthog from "posthog-js";
+import { useT } from "@/lib/i18n";
 import type { FeedbackInsight } from "@/lib/claude/feedback";
 
 // ---------------------------------------------------------------------------
@@ -17,13 +18,21 @@ interface FeedbackPanelProps {
   editor?: Editor | null;
 }
 
-const FILTER_LABELS: Record<FilterType, string> = {
-  all:      "Tất cả",
-  strength: "Điểm mạnh",
-  improve:  "Cải thiện",
-  warning:  "Lưu ý",
-  culture:  "Văn hóa",
-  note:     "Ghi chú",
+const FILTER_KEYS: Record<FilterType, string> = {
+  all:      "filterAll",
+  strength: "filterStrength",
+  improve:  "filterImprove",
+  warning:  "filterWarning",
+  culture:  "filterCulture",
+  note:     "filterNote",
+};
+
+const TYPE_KEYS: Record<string, string> = {
+  strength: "typeStrength",
+  improve:  "typeImprove",
+  warning:  "typeWarning",
+  culture:  "typeCulture",
+  note:     "typeNote",
 };
 
 const TYPE_COLORS = {
@@ -145,6 +154,7 @@ function SkeletonCard({ widths }: { widths: [number, number] }) {
 // ---------------------------------------------------------------------------
 
 export function FeedbackPanel({ draftId, docTypeSlug, editor }: FeedbackPanelProps) {
+  const t = useT("feedbackPanel");
   const [insights, setInsights]       = useState<FeedbackInsight[]>([]);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [loading, setLoading]         = useState(true);
@@ -314,11 +324,11 @@ export function FeedbackPanel({ draftId, docTypeSlug, editor }: FeedbackPanelPro
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <InfoIcon color="#185FA5" />
             <span style={{ fontSize: 14, fontWeight: 500, color: "#1B3A5C" }}>
-              Phân tích tài liệu
+              {t("heading")}
             </span>
             {!loading && (
               <span style={{ background: "#F1EFE8", borderRadius: 10, padding: "2px 8px", fontSize: 11, color: "#5F5E5A" }}>
-                {filteredCount} nhận xét
+                {t("commentCount", { count: filteredCount })}
               </span>
             )}
           </div>
@@ -340,7 +350,7 @@ export function FeedbackPanel({ draftId, docTypeSlug, editor }: FeedbackPanelPro
                     {c && (
                       <span style={{ width: 6, height: 6, borderRadius: "50%", background: activeFilter === f ? c.activeColor : c.dot, flexShrink: 0 }} />
                     )}
-                    {FILTER_LABELS[f]}
+                    {t(FILTER_KEYS[f] as "filterAll")}
                   </button>
                 );
               })}
@@ -358,7 +368,7 @@ export function FeedbackPanel({ draftId, docTypeSlug, editor }: FeedbackPanelPro
             </>
           ) : filtered.length === 0 ? (
             <p style={{ fontSize: 13, color: "#5F5E5A", textAlign: "center", padding: "12px 0" }}>
-              Không có nhận xét nào.
+              {t("noComments")}
             </p>
           ) : (
             filtered.map((insight) => {
@@ -382,7 +392,7 @@ export function FeedbackPanel({ draftId, docTypeSlug, editor }: FeedbackPanelPro
                     <TypeIcon type={insight.type} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: c.text, marginBottom: 2 }}>
-                        {FILTER_LABELS[insight.type]}
+                        {t(TYPE_KEYS[insight.type] as "typeStrength")}
                       </div>
                       <div style={{ fontSize: 13, fontWeight: 500, color: "#1B3A5C", lineHeight: 1.4 }}>
                         {insight.title}
@@ -430,7 +440,7 @@ export function FeedbackPanel({ draftId, docTypeSlug, editor }: FeedbackPanelPro
                         alignSelf: "flex-start",
                       }}
                     >
-                      {isApplying ? "Đang áp dụng…" : "Áp dụng gợi ý này →"}
+                      {isApplying ? t("applying") : t("applyAction")}
                     </button>
                   )}
                 </div>
@@ -455,7 +465,7 @@ export function FeedbackPanel({ draftId, docTypeSlug, editor }: FeedbackPanelPro
             {/* Left: score bar */}
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ fontSize: 12, color: "#5F5E5A", whiteSpace: "nowrap" }}>
-                Chất lượng tổng thể
+                {t("overallQuality")}
               </span>
               <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
                 {Array.from({ length: 10 }, (_, i) => (
@@ -479,10 +489,7 @@ export function FeedbackPanel({ draftId, docTypeSlug, editor }: FeedbackPanelPro
             {/* Right: improvement hint */}
             {improveCount > 0 && targetScore > score && (
               <span style={{ fontSize: 12, color: "#5F5E5A" }}>
-                Áp dụng{" "}
-                <strong style={{ color: "#185FA5" }}>{improveCount} gợi ý</strong>{" "}
-                cải thiện để đạt{" "}
-                <strong style={{ color: "#1B3A5C" }}>{targetScore}/10</strong>
+                {t("improveHint", { count: improveCount, target: targetScore })}
               </span>
             )}
           </div>

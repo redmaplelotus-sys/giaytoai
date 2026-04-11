@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useT, useTA } from "@/lib/i18n";
 import type { getUserSessions } from "@/lib/db/sessions";
 
 // ---------------------------------------------------------------------------
@@ -18,18 +19,9 @@ type ExportRow = { id: string; format: string; r2_key: string | null; created_at
 // Static lookups
 // ---------------------------------------------------------------------------
 
-const DESTINATION_MAP: Record<string, { flag: string; name: string }> = {
-  au: { flag: "🇦🇺", name: "Australia"  },
-  us: { flag: "🇺🇸", name: "USA"        },
-  uk: { flag: "🇬🇧", name: "UK"         },
-  ko: { flag: "🇰🇷", name: "Korea"      },
-  cn: { flag: "🇨🇳", name: "China"      },
-  ca: { flag: "🇨🇦", name: "Canada"     },
-  de: { flag: "🇩🇪", name: "Germany"    },
-  jp: { flag: "🇯🇵", name: "Japan"      },
-  vn: { flag: "🇻🇳", name: "Vietnam"    },
-  sg: { flag: "🇸🇬", name: "Singapore"  },
-  fr: { flag: "🇫🇷", name: "France"     },
+const DESTINATION_FLAGS: Record<string, string> = {
+  au: "🇦🇺", us: "🇺🇸", uk: "🇬🇧", ko: "🇰🇷", cn: "🇨🇳",
+  ca: "🇨🇦", de: "🇩🇪", jp: "🇯🇵", vn: "🇻🇳", sg: "🇸🇬", fr: "🇫🇷",
 };
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
@@ -39,18 +31,12 @@ const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
   failed:     { bg: "var(--color-red-light)",   color: "var(--color-red)"            },
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  pending:    "Pending",
-  processing: "Processing",
-  completed:  "Completed",
-  failed:     "Failed",
-};
-
 // ---------------------------------------------------------------------------
 // Re-download button
 // ---------------------------------------------------------------------------
 
 function ReDownloadButton({ exportId }: { exportId: string }) {
+  const t = useT("history");
   const [state, setState] = useState<"idle" | "loading" | "error">("idle");
 
   async function handleClick() {
@@ -74,7 +60,7 @@ function ReDownloadButton({ exportId }: { exportId: string }) {
       type="button"
       onClick={handleClick}
       disabled={state === "loading"}
-      title={state === "error" ? "Download failed — try again" : "Re-download file"}
+      title={state === "error" ? t("downloadFailed") : t("redownload")}
       className="btn-pill"
       style={state === "error" ? { background: "var(--color-red-light)", color: "var(--color-red)", borderColor: "#F0B8B8" } : {}}
     >
@@ -82,7 +68,7 @@ function ReDownloadButton({ exportId }: { exportId: string }) {
         ? <span className="inline-block h-3 w-3 animate-spin rounded-full border-2" style={{ borderColor: "var(--color-border-strong)", borderTopColor: "transparent" }} />
         : <span aria-hidden="true">⬇</span>
       }
-      {state === "error" ? "Retry" : "Download"}
+      {state === "error" ? t("retry") : t("download")}
     </button>
   );
 }
@@ -96,6 +82,9 @@ export interface SessionListProps {
 }
 
 export function SessionList({ sessions }: SessionListProps) {
+  const t = useT("history");
+  const m = useTA();
+
   if (sessions.length === 0) {
     return (
       <div
@@ -103,10 +92,10 @@ export function SessionList({ sessions }: SessionListProps) {
         style={{ border: "1.5px dashed var(--color-border-default)" }}
       >
         <p style={{ fontSize: 14, color: "var(--color-text-muted)" }}>
-          You don&apos;t have any documents yet.
+          {t("empty")}
         </p>
         <Link href="/dashboard/new" className="btn-primary" style={{ marginTop: 16, display: "inline-flex" }}>
-          Create your first document
+          {t("emptyAction")}
         </Link>
       </div>
     );
@@ -123,17 +112,18 @@ export function SessionList({ sessions }: SessionListProps) {
           color: "var(--color-text-muted)",
         }}
       >
-        <span>Document</span>
-        <span>Destination</span>
-        <span>Date</span>
-        <span>Status</span>
+        <span>{t("tableDocument")}</span>
+        <span>{t("tableDestination")}</span>
+        <span>{t("tableDate")}</span>
+        <span>{t("tableStatus")}</span>
         <span />
       </div>
 
       {sessions.map((session, i) => {
         const answers     = (session.answers ?? {}) as Record<string, unknown>;
         const destCode    = typeof answers.destination === "string" ? answers.destination : null;
-        const dest        = destCode ? DESTINATION_MAP[destCode] : null;
+        const destFlag    = destCode ? DESTINATION_FLAGS[destCode] : null;
+        const destName    = destCode ? (m.destinations as Record<string, string>)[destCode] : null;
         const docType     = session.document_types as unknown as DocType | null;
 
         const drafts      = (session.drafts as DraftRow[] | null) ?? [];
@@ -155,6 +145,7 @@ export function SessionList({ sessions }: SessionListProps) {
 
         const status = session.status as string;
         const statusStyle = STATUS_STYLE[status] ?? STATUS_STYLE.pending;
+        const statusLabel = (m.session.status as Record<string, string>)[status] ?? status;
 
         return (
           <div
@@ -169,14 +160,14 @@ export function SessionList({ sessions }: SessionListProps) {
                 className="block truncate text-sm font-medium hover:underline"
                 style={{ color: "var(--color-text-primary)" }}
               >
-                {docType?.name_en ?? "Document"}
+                {docType?.name_vi ?? docType?.name_en ?? t("tableDocument")}
               </Link>
             </div>
 
             {/* Destination */}
             <div className="text-sm sm:whitespace-nowrap" style={{ color: "var(--color-text-secondary)" }}>
-              {dest
-                ? <span>{dest.flag} {dest.name}</span>
+              {destFlag && destName
+                ? <span>{destFlag} {destName}</span>
                 : <span style={{ color: "var(--color-text-hint)" }}>—</span>
               }
             </div>
@@ -192,14 +183,14 @@ export function SessionList({ sessions }: SessionListProps) {
                 className="inline-block rounded-full px-2 py-0.5 text-xs font-medium"
                 style={{ background: statusStyle.bg, color: statusStyle.color }}
               >
-                {STATUS_LABEL[status] ?? status}
+                {statusLabel}
               </span>
             </div>
 
             {/* Actions */}
             <div className="flex items-center gap-2">
               <Link href={href} className="btn-pill">
-                {latestDraft ? "Open" : "Continue"}
+                {latestDraft ? t("open") : t("continue")}
               </Link>
               {latestExport && (
                 <ReDownloadButton exportId={latestExport.id} />
