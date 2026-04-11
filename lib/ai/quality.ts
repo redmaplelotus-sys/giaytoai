@@ -97,7 +97,10 @@ export async function checkQualityAsync(
   };
 
   try {
-    parsed = JSON.parse(raw.text);
+    // Strip optional ```json ... ``` fences before parsing
+    const text = raw.text.trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
   } catch {
     throw new Error(`Quality check returned invalid JSON: ${raw.text.slice(0, 200)}`);
   }
