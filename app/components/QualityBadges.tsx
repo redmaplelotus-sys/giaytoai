@@ -2,6 +2,7 @@
 
 import type { QualityReport } from "@/lib/ai/quality";
 import { useDraftQuality } from "@/hooks/useDraftQuality";
+import { useT } from "@/lib/i18n";
 
 // ---------------------------------------------------------------------------
 // Colour helpers
@@ -60,48 +61,53 @@ function SkeletonPill() {
 // ---------------------------------------------------------------------------
 
 export function LengthBadge({ quality }: { quality: QualityReport }) {
+  const t = useT("quality");
   const { actual, target, status, delta } = quality.wordCountStatus;
   const color = wordCountColor(status);
 
   let label: string;
   let icon:  string;
   if (status === "ok") {
-    label = target ? `${actual} / ${target} words` : `${actual} words`;
+    label = target
+      ? t("wordCount.ok", { actual, target })
+      : t("wordCount.unknown", { actual });
     icon  = "✓";
   } else if (status === "over") {
-    label = `${actual} words (+${delta} over)`;
+    label = t("wordCount.over", { delta: delta! });
     icon  = "↑";
   } else if (status === "under") {
-    label = `${actual} words (${Math.abs(delta!)} short)`;
+    label = t("wordCount.under", { delta: Math.abs(delta!) });
     icon  = "↓";
   } else {
-    label = `${actual} words`;
+    label = t("wordCount.unknown", { actual });
     icon  = "≈";
   }
 
-  return <Pill color={color} icon={icon} label={label} title="Word count" />;
+  return <Pill color={color} icon={icon} label={label} title={t("heading")} />;
 }
 
 export function ToneBadge({ quality }: { quality: QualityReport }) {
+  const t = useT("quality");
   const color = scoreColor(quality.toneScore);
   return (
     <Pill
       color={color}
       icon="♜"
-      label={`Tone ${quality.toneScore}/5`}
+      label={`${t("tone")} ${t("score", { score: quality.toneScore })}`}
       title={quality.toneNote}
     />
   );
 }
 
 export function FitBadge({ quality }: { quality: QualityReport }) {
+  const t = useT("quality");
   const color = scoreColor(quality.specificityScore);
   return (
     <Pill
       color={color}
       icon="◎"
-      label={`Fit ${quality.specificityScore}/5`}
-      title="How specifically the draft uses the applicant's details"
+      label={`${t("specificity")} ${t("score", { score: quality.specificityScore })}`}
+      title={t("specificity")}
     />
   );
 }

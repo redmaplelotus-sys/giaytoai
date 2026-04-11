@@ -291,6 +291,15 @@ const en: Translations = {
     sg: "Singapore",
     fr: "France",
   },
+  documentToolbar: {
+    words: "{count} words",
+    translate: "Translate",
+    hideTranslation: "Hide translation",
+    wordTitle: "Download as Word (.docx)",
+    htmlTitle: "Download as HTML file",
+    pdfTitle: "Download as PDF",
+    bilingualTitle: "Download bilingual Word (.docx)",
+  },
   refinement: {
     moreFormal: "More Formal",
     expand: "Expand",

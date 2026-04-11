@@ -290,6 +290,15 @@ const vi = {
     sg: "Singapore",
     fr: "Pháp",
   },
+  documentToolbar: {
+    words: "{count} từ",
+    translate: "Dịch",
+    hideTranslation: "Ẩn bản dịch",
+    wordTitle: "Tải về Word (.docx)",
+    htmlTitle: "Tải về HTML",
+    pdfTitle: "Tải về PDF",
+    bilingualTitle: "Tải về Word song ngữ (.docx)",
+  },
   refinement: {
     moreFormal: "Trang trọng hơn",
     expand: "Mở rộng",

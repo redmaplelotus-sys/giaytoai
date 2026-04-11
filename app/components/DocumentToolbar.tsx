@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Editor } from "@tiptap/react";
 import { exportToPdf } from "@/lib/export-pdf";
+import { useT } from "@/lib/i18n";
 import posthog from "posthog-js";
 
 // ---------------------------------------------------------------------------
@@ -86,11 +87,12 @@ function ProgressBar({ current, target }: ProgressBarProps) {
 // Export button
 // ---------------------------------------------------------------------------
 
-const FORMAT_CONFIG: Record<ExportFormat, { label: string; icon: string; title: string }> = {
-  docx:      { label: "Word",    icon: "⬇", title: "Download as Word (.docx)"        },
-  bilingual: { label: "EN | VI", icon: "⬇", title: "Download bilingual Word (.docx)" },
-  html:      { label: "HTML",    icon: "⬇", title: "Download as HTML file"           },
-  pdf:       { label: "PDF",     icon: "⬇", title: "Download as PDF"                 },
+const FORMAT_LABEL: Record<ExportFormat, string> = {
+  docx: "Word", bilingual: "EN | VI", html: "HTML", pdf: "PDF",
+};
+
+const FORMAT_TITLE_KEY: Record<ExportFormat, string> = {
+  docx: "wordTitle", bilingual: "bilingualTitle", html: "htmlTitle", pdf: "pdfTitle",
 };
 
 interface ExportButtonProps {
@@ -101,11 +103,11 @@ interface ExportButtonProps {
 }
 
 function ExportButton({ format, loading, disabled, onClick }: ExportButtonProps) {
-  const cfg = FORMAT_CONFIG[format];
+  const t = useT("documentToolbar");
   return (
     <button
       type="button"
-      title={cfg.title}
+      title={t(FORMAT_TITLE_KEY[format] as "wordTitle")}
       disabled={disabled}
       onClick={onClick}
       className="btn-pill"
@@ -115,9 +117,9 @@ function ExportButton({ format, loading, disabled, onClick }: ExportButtonProps)
             className="inline-block h-3 w-3 animate-spin rounded-full border-2"
             style={{ borderColor: "var(--color-border-strong)", borderTopColor: "transparent" }}
           />
-        : <span aria-hidden="true">{cfg.icon}</span>
+        : <span aria-hidden="true">⬇</span>
       }
-      {cfg.label}
+      {FORMAT_LABEL[format]}
     </button>
   );
 }
@@ -134,6 +136,7 @@ export function DocumentToolbar({
   onToggleTranslation,
   vietnameseText,
 }: DocumentToolbarProps) {
+  const t = useT("documentToolbar");
   const [wordCount,   setWordCount]   = useState(0);
   const [exportState, setExportState] = useState<ExportState>({ format: null, status: "idle", error: null });
 
@@ -210,7 +213,7 @@ export function DocumentToolbar({
             <ProgressBar current={wordCount} target={targetWordCount} />
           ) : (
             <span className="tabular-nums text-xs" style={{ color: "var(--color-text-muted)" }}>
-              {wordCount} words
+              {t("words", { count: wordCount })}
             </span>
           )}
         </div>
@@ -222,7 +225,7 @@ export function DocumentToolbar({
             onClick={onToggleTranslation}
             className={`btn-pill ${showTranslation ? "btn-pill-active" : ""}`}
           >
-            🇻🇳 {showTranslation ? "Hide translation" : "Translate"}
+            🇻🇳 {showTranslation ? t("hideTranslation") : t("translate")}
           </button>
 
           <span

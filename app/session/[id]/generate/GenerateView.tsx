@@ -423,6 +423,17 @@ export function GenerateView({ sessionId, targetWordCount, docTypeSlug = "" }: {
         <EditorContent editor={editor} />
       </div>
 
+      {/* ── Quality badges (right below editor) ── */}
+      {activeRevision && !isStreaming && (
+        <PollingQualityBadges
+          draftId={activeRevision.id}
+          initialQuality={
+            activeIndex === revisions.length - 1 ? quality : activeRevision.quality
+          }
+          showDetail
+        />
+      )}
+
       {/* ── Document toolbar ── */}
       {activeRevision && !isStreaming && (
         <DocumentToolbar
@@ -447,17 +458,6 @@ export function GenerateView({ sessionId, targetWordCount, docTypeSlug = "" }: {
           draftText={activeRevision.text}
           draftId={activeRevision.id}
           onTranslated={setTranslationText}
-        />
-      )}
-
-      {/* ── Quality badges ── */}
-      {activeRevision && !isStreaming && (
-        <PollingQualityBadges
-          draftId={activeRevision.id}
-          initialQuality={
-            activeIndex === revisions.length - 1 ? quality : activeRevision.quality
-          }
-          showDetail
         />
       )}
 

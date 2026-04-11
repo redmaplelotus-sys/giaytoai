@@ -285,6 +285,15 @@ const zh: Translations = {
     sg: "新加坡",
     fr: "法国",
   },
+  documentToolbar: {
+    words: "{count} 字",
+    translate: "翻译",
+    hideTranslation: "隐藏翻译",
+    wordTitle: "下载为 Word (.docx)",
+    htmlTitle: "下载为 HTML",
+    pdfTitle: "下载为 PDF",
+    bilingualTitle: "下载双语 Word (.docx)",
+  },
   refinement: {
     moreFormal: "更正式",
     expand: "扩展",

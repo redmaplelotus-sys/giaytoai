@@ -286,6 +286,15 @@ const ko: Translations = {
     sg: "싱가포르",
     fr: "프랑스",
   },
+  documentToolbar: {
+    words: "{count}단어",
+    translate: "번역",
+    hideTranslation: "번역 숨기기",
+    wordTitle: "Word (.docx)로 다운로드",
+    htmlTitle: "HTML로 다운로드",
+    pdfTitle: "PDF로 다운로드",
+    bilingualTitle: "이중 언어 Word (.docx) 다운로드",
+  },
   refinement: {
     moreFormal: "격식체",
     expand: "확장",
