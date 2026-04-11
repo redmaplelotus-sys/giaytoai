@@ -247,17 +247,26 @@ export function useGenerateStream(editor: Editor | null) {
             const serverFirstTokenMs = data.firstTokenMs as number | null;
             const serverTotalMs      = data.totalMs      as number | null;
 
-            // If Claude returned JSON (legacy system prompt), extract body only.
+            // Clean up editor content: strip legacy JSON wrapper and --- notes section.
             if (editor) {
               const raw = editor.getText();
-              if (raw.trimStart().startsWith("{")) {
+              let clean = raw;
+
+              // Legacy: Claude returned a JSON object — extract body field
+              if (clean.trimStart().startsWith("{")) {
                 try {
-                  const parsed = JSON.parse(raw) as { body?: string };
-                  if (typeof parsed.body === "string") {
-                    editor.commands.clearContent(false);
-                    editor.commands.setContent(parsed.body);
-                  }
-                } catch { /* not JSON, leave as-is */ }
+                  const parsed = JSON.parse(clean) as { body?: string };
+                  if (typeof parsed.body === "string") clean = parsed.body;
+                } catch { /* not JSON */ }
+              }
+
+              // Strip --- notes section appended by Claude
+              const notesSep = clean.match(/\n---+\n[\s\S]+$/);
+              if (notesSep) clean = clean.slice(0, notesSep.index).trim();
+
+              if (clean !== raw) {
+                editor.commands.clearContent(false);
+                editor.commands.setContent(clean);
               }
             }
 

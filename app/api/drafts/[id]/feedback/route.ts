@@ -2,7 +2,25 @@ import { auth } from "@clerk/nextjs/server";
 import type { NextRequest } from "next/server";
 import { getSupabaseForUser } from "@/lib/supabase";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { generateFeedback } from "@/lib/claude/feedback";
+import { generateFeedback, type FeedbackInsight } from "@/lib/claude/feedback";
+
+// ---------------------------------------------------------------------------
+// Parse Claude's own --- notes section into FeedbackInsight warning items
+// ---------------------------------------------------------------------------
+function parseClaudeNotes(notesText: string): FeedbackInsight[] {
+  if (!notesText.trim()) return [];
+  return notesText
+    .split("\n")
+    .map((l) => l.replace(/^[-•*]\s*/, "").trim())
+    .filter((l) => l.length > 10)
+    .map((note) => ({
+      id: crypto.randomUUID(),
+      type: "warning" as const,
+      title: note.length > 55 ? note.slice(0, 55).trimEnd() + "…" : note,
+      body: note,
+      actionable: false,
+    }));
+}
 
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
@@ -62,20 +80,27 @@ export async function GET(
   const destination = String(
     answers.destination ?? answers.target_country ?? answers.goal ?? "",
   );
-  const documentContent =
-    (draft.content as { text?: string } | null)?.text ?? "";
+  const content = draft.content as { text?: string; notes?: string } | null;
+  const documentContent = content?.text ?? "";
+  const claudeNotes     = content?.notes ?? "";
 
   if (!documentContent.trim()) {
     return Response.json({ insights: [] });
   }
 
-  // ── Generate feedback via Haiku ───────────────────────────────────────────
-  const insights = await generateFeedback({
+  // ── Parse Claude's own notes (--- section) into warning insights ──────────
+  const noteInsights = parseClaudeNotes(claudeNotes);
+
+  // ── Generate AI feedback via Haiku ────────────────────────────────────────
+  const aiInsights = await generateFeedback({
     documentContent,
     docTypeSlug,
     destination,
     answersVi: answers,
   });
+
+  // Claude's own notes come first so users see them immediately
+  const insights = [...noteInsights, ...aiInsights];
 
   // ── Cache in quality_data.feedbackInsights (merge with existing data) ─────
   const merged = { ...qualityData, feedbackInsights: insights };

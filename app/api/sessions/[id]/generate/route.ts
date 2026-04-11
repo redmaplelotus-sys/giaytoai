@@ -195,9 +195,16 @@ export async function POST(
             if (typeof parsed.body === "string") saveText = parsed.body;
           } catch { /* not JSON */ }
         }
+
+        // Strip any --- notes section Claude appended; store it separately so
+        // the feedback panel can surface it without polluting the document.
+        const notesSepMatch = saveText.match(/\n---+\n([\s\S]+)$/);
+        const claudeNotes   = notesSepMatch ? notesSepMatch[1].trim() : undefined;
+        const cleanText     = notesSepMatch ? saveText.slice(0, notesSepMatch.index).trim() : saveText;
+
         await completeDraft(
           draftId,
-          { text: saveText },
+          { text: cleanText, ...(claudeNotes ? { notes: claudeNotes } : {}) },
           "claude-opus-4-6",
           doneChunk.inputTokens + doneChunk.outputTokens,
         );
@@ -207,7 +214,7 @@ export async function POST(
         // ── 9b. Quality check (non-blocking — don't delay SSE done event) ─
         let quality = null;
         try {
-          quality = await checkQualityAsync(saveText, docTypeName, targetWords);
+          quality = await checkQualityAsync(cleanText, docTypeName, targetWords);
           const score = Math.round(
             (quality.toneScore + quality.specificityScore) / 2,
           ) as 1 | 2 | 3 | 4 | 5;
