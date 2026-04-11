@@ -2,26 +2,27 @@
 
 import type { Editor } from "@tiptap/react";
 import { useRefinement, type RefinementAction } from "@/hooks/useRefinement";
+import { useT } from "@/lib/i18n";
 
 // ---------------------------------------------------------------------------
 // Button config
 // ---------------------------------------------------------------------------
 
 interface ButtonDef {
-  action:  RefinementAction;
-  label:   string;
-  icon:    string;
-  title:   string;
-  mode:    "replace" | "analysis";
+  action:   RefinementAction;
+  labelKey: string;
+  titleKey: string;
+  icon:     string;
+  mode:     "replace" | "analysis";
 }
 
 const BUTTONS: ButtonDef[] = [
-  { action: "moreFormal",   label: "More Formal",   icon: "🎩", title: "Rewrite in a more formal, professional academic register", mode: "replace"  },
-  { action: "expand",       label: "Expand",        icon: "⤢",  title: "Expand with ~25% more specific detail",                   mode: "replace"  },
-  { action: "shorten",      label: "Shorten",       icon: "⤡",  title: "Condense by ~25% without losing key points",             mode: "replace"  },
-  { action: "addKeywords",  label: "Keywords",      icon: "🔑", title: "Naturally integrate programme/role-relevant keywords",    mode: "replace"  },
-  { action: "cultureCheck", label: "Culture Check", icon: "🌏", title: "Analyse cultural fit: directness, evidence, framing",    mode: "analysis" },
-  { action: "fixEnglish",   label: "Fix English",   icon: "✏️", title: "Fix grammar, articles, prepositions, and ESL errors",   mode: "replace"  },
+  { action: "moreFormal",   labelKey: "moreFormal",   titleKey: "moreFormalTitle",   icon: "🎩", mode: "replace"  },
+  { action: "expand",       labelKey: "expand",       titleKey: "expandTitle",       icon: "⤢",  mode: "replace"  },
+  { action: "shorten",      labelKey: "shorten",      titleKey: "shortenTitle",      icon: "⤡",  mode: "replace"  },
+  { action: "addKeywords",  labelKey: "addKeywords",  titleKey: "addKeywordsTitle",  icon: "🔑", mode: "replace"  },
+  { action: "cultureCheck", labelKey: "cultureCheck", titleKey: "cultureCheckTitle", icon: "🌏", mode: "analysis" },
+  { action: "fixEnglish",   labelKey: "fixEnglish",   titleKey: "fixEnglishTitle",   icon: "✏️", mode: "replace"  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -41,7 +42,8 @@ function Spinner() {
 // Feedback panel (cultureCheck result)
 // ---------------------------------------------------------------------------
 
-function FeedbackPanel({ text, onClose }: { text: string; onClose: () => void }) {
+function CultureFeedbackPanel({ text, onClose }: { text: string; onClose: () => void }) {
+  const t = useT("refinement");
   return (
     <div
       style={{
@@ -55,14 +57,14 @@ function FeedbackPanel({ text, onClose }: { text: string; onClose: () => void })
         style={{ borderBottom: "1px solid var(--color-border-default)" }}
       >
         <span className="text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>
-          🌏 Culture Check
+          🌏 {t("cultureCheckHeading")}
         </span>
         <button
           type="button"
           onClick={onClose}
           className="btn-ghost"
           style={{ padding: "2px 6px", fontSize: 12 }}
-          aria-label="Close feedback"
+          aria-label={t("closeFeedback")}
         >
           ✕
         </button>
@@ -86,6 +88,7 @@ interface RefinementToolbarProps {
 }
 
 export function RefinementToolbar({ editor, draftId }: RefinementToolbarProps) {
+  const t = useT("refinement");
   const { state, refine, clearFeedback, abort } = useRefinement(editor, draftId);
   const { status, activeAction, feedback, error } = state;
   const isBusy = status === "loading";
@@ -94,7 +97,7 @@ export function RefinementToolbar({ editor, draftId }: RefinementToolbarProps) {
     <div className="space-y-2">
       {/* ── Button row ── */}
       <div className="flex flex-wrap gap-1.5">
-        {BUTTONS.map(({ action, label, icon, title }) => {
+        {BUTTONS.map(({ action, labelKey, titleKey, icon }) => {
           const isActive   = isBusy && activeAction === action;
           const isDisabled = isBusy && activeAction !== action;
 
@@ -102,15 +105,15 @@ export function RefinementToolbar({ editor, draftId }: RefinementToolbarProps) {
             <button
               key={action}
               type="button"
-              title={title}
+              title={t(titleKey as "moreFormalTitle")}
               disabled={isDisabled || !draftId}
               onClick={() => isActive ? abort() : refine(action)}
               className={`btn-pill ${isActive ? "btn-pill-active" : ""}`}
             >
               {isActive ? <Spinner /> : <span aria-hidden="true">{icon}</span>}
-              {label}
+              {t(labelKey as "moreFormal")}
               {isActive && (
-                <span style={{ color: "rgba(255,255,255,0.6)", marginLeft: 2 }}>· stop</span>
+                <span style={{ color: "rgba(255,255,255,0.6)", marginLeft: 2 }}>· {t("stop")}</span>
               )}
             </button>
           );
@@ -124,7 +127,7 @@ export function RefinementToolbar({ editor, draftId }: RefinementToolbarProps) {
 
       {/* ── Culture check feedback panel ── */}
       {feedback && (
-        <FeedbackPanel text={feedback} onClose={clearFeedback} />
+        <CultureFeedbackPanel text={feedback} onClose={clearFeedback} />
       )}
     </div>
   );
