@@ -402,8 +402,8 @@ export function GenerateView({ sessionId, targetWordCount, docTypeSlug = "" }: {
         </div>
       </div>
 
-      {/* ── Safety warning ── */}
-      {safety && (
+      {/* ── Safety warning — only show block verdicts, not noisy warns ── */}
+      {safety && safety.verdict === "block" && (
         <div
           className="px-4 py-3"
           style={{
