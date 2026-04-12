@@ -150,6 +150,17 @@ export function useRefinement(
           }
 
           if (eventName === "done") {
+            // Convert plain text to proper HTML paragraphs
+            if (editorCleared && accumulated && !isAnalysis) {
+              const html = accumulated
+                .split(/\n{2,}/)
+                .map((p) => p.trim())
+                .filter(Boolean)
+                .map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`)
+                .join("");
+              editor.commands.clearContent(false);
+              editor.commands.setContent(html);
+            }
             setState((s) => ({ ...s, status: "done" }));
           }
 
