@@ -90,7 +90,9 @@ export async function checkContentSafety(
 
   let parsed: { verdict: string; flags: string[]; reason: string };
   try {
-    parsed = JSON.parse(raw.text);
+    const text = raw.text.trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
   } catch {
     // Fail open with a warn so generation is not silently blocked on parse errors.
     return {
