@@ -70,7 +70,7 @@ const VARIANTS: Record<string, React.CSSProperties> = {
     padding: "14px 28px",
     fontSize: 16,
     fontWeight: 700,
-    outline: "2px solid #1D9E75",
+    outline: "2px solid #3B6D11",
     outlineOffset: 3,
     gap: 10,
   },
