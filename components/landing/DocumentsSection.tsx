@@ -100,16 +100,16 @@ export function DocumentsSection() {
         {/* Doc grid */}
         <div className={styles.docsGrid}>
           {docs.map((doc, i) => (
-            <div key={`${active}-${i}`} className={styles.docCard}>
+            <div key={`${active}-${i}`} className={styles.docCard} style={{ position: "relative" }}>
               <DocIcon type={doc.type} />
               <div className={styles.docMeta}>
                 <p className={styles.docName}>{doc.name}</p>
                 <p className={styles.docDesc}>{doc.desc}</p>
                 {doc.dest && <p className={styles.docDest}>{doc.dest}</p>}
-                <Button variant="primary" size="sm" arrow href="/dashboard/new" style={{ padding: "6px 14px", fontSize: 12, outline: "none" }}>
-                  Tạo
-                </Button>
               </div>
+              <Button variant="primary" size="sm" arrow href="/dashboard/new" style={{ padding: "6px 14px", fontSize: 12, outline: "none", position: "absolute", top: 14, right: 16 }}>
+                Tạo
+              </Button>
             </div>
           ))}
         </div>
