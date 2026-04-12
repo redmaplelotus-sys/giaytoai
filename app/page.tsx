@@ -3,6 +3,7 @@ import Image from "next/image";
 import { HeroCarousel } from "@/components/landing/HeroCarousel";
 import { DocumentsSection } from "@/components/landing/DocumentsSection";
 import { PricingSection } from "@/components/landing/PricingSection";
+import { Button } from "@/components/ui/Button";
 import styles from "./LandingPage.module.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -292,9 +293,9 @@ function FinalCta() {
         <p className={styles.finalCtaP}>
           2 tài liệu đầu tiên hoàn toàn miễn phí. Không cần thẻ ngân hàng.
         </p>
-        <Link href="/sign-up" className={styles.finalCtaBtn}>
-          Thử miễn phí ngay →
-        </Link>
+        <Button variant="primary-dark" arrow href="/sign-up">
+          Thử miễn phí ngay
+        </Button>
         <p className={styles.finalCtaNote}>
           Thanh toán bằng chuyển khoản ngân hàng Việt Nam · Hỗ trợ tiếng Việt
         </p>
@@ -368,12 +369,12 @@ export default function HomePage() {
             </p>
 
             <div className={styles.ctaRow}>
-              <Link href="/sign-up" className={styles.ctaPrimary}>
-                Thử miễn phí →
-              </Link>
-              <Link href="#documents" className={styles.ctaOutline}>
+              <Button variant="primary" arrow href="/sign-up">
+                Thử miễn phí
+              </Button>
+              <Button variant="ghost" href="#documents">
                 Xem ví dụ
-              </Link>
+              </Button>
             </div>
 
             <p className={styles.ctaNote}>

@@ -6,6 +6,7 @@ import { useT, useTA } from "@/lib/i18n";
 import { DocTypePreviewCard } from "@/app/components/DocTypePreviewCard";
 import { OUTPUT_LANGUAGES, type OutputLanguageCode } from "@/lib/prompts/compile";
 import type { DocTypeSlug } from "@/lib/prompts/registry";
+import { Button } from "@/components/ui/Button";
 
 // ---------------------------------------------------------------------------
 // Static config — proper nouns stay in English; flags are universal
@@ -281,15 +282,15 @@ export default function NewSessionPage() {
       )}
 
       {/* ── Continue ── */}
-      <button
-        type="button"
+      <Button
+        variant="primary"
+        arrow
         onClick={handleContinue}
         disabled={!canContinue}
-        className="btn-primary w-full"
-        style={{ padding: "12px 20px", borderRadius: "var(--radius-xl)", fontSize: 15 }}
+        style={{ width: "100%", justifyContent: "center" }}
       >
         {submitting ? m.common.loading : t("continueButton")}
-      </button>
+      </Button>
     </main>
   );
 }

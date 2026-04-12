@@ -12,6 +12,7 @@ import {
 } from "@/lib/session/answers";
 import { QuestionField } from "./QuestionField";
 import { CvDropZone } from "./CvDropZone";
+import { Button } from "@/components/ui/Button";
 
 // ---------------------------------------------------------------------------
 // Main form
@@ -189,15 +190,15 @@ export function AnswersForm({
             {t("fieldsRemaining", { count: total - filled })}
           </p>
         )}
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          arrow
           onClick={handleGenerate}
           disabled={!allFilled}
-          className="btn-primary w-full"
-          style={{ padding: "12px 20px", borderRadius: "var(--radius-xl)", fontSize: 15 }}
+          style={{ width: "100%", justifyContent: "center" }}
         >
           {t("generateButton")}
-        </button>
+        </Button>
       </div>
     </main>
   );

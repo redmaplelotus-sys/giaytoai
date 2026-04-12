@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useT } from "@/lib/i18n";
+import { Button } from "@/components/ui/Button";
 import { SessionList } from "./SessionList";
 import type { getUserSessions } from "@/lib/db/sessions";
 
@@ -16,9 +16,9 @@ export function DashboardClient({ sessions }: { sessions: SessionRow[] }) {
         <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-text-primary)", letterSpacing: "-0.02em" }}>
           {t("heading")}
         </h1>
-        <Link href="/dashboard/new" className="btn-primary">
+        <Button variant="primary" size="sm" arrow href="/dashboard/new">
           {t("newDocument")}
-        </Link>
+        </Button>
       </div>
 
       <SessionList sessions={sessions} />

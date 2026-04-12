@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { useT } from "@/lib/i18n";
+import { Button } from "@/components/ui/Button";
 
 // ---------------------------------------------------------------------------
 // Credit pill
@@ -234,33 +235,21 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-2 shrink-0 ml-auto">
           {isLoaded && isSignedIn && (
             <>
-              <Link
-                href="/dashboard/new"
-                className="btn-primary"
-                style={{ fontSize: 13, padding: "6px 14px" }}
-              >
+              <Button variant="primary" size="sm" arrow href="/dashboard/new">
                 {t("createDoc")}
-              </Link>
+              </Button>
               <CreditPill />
               <UserButton />
             </>
           )}
           {isLoaded && !isSignedIn && (
             <>
-              <Link
-                href="/sign-in"
-                className="btn-ghost"
-                style={{ fontSize: 13, padding: "6px 12px" }}
-              >
+              <Button variant="ghost" size="sm" href="/sign-in" style={{ fontSize: 13, padding: "6px 12px" }}>
                 {t("signIn")}
-              </Link>
-              <Link
-                href="/sign-up"
-                className="btn-primary"
-                style={{ fontSize: 13, padding: "6px 14px" }}
-              >
+              </Button>
+              <Button variant="primary" size="sm" arrow href="/sign-up">
                 {t("tryFree")}
-              </Link>
+              </Button>
             </>
           )}
         </div>
@@ -338,22 +327,12 @@ export function Navbar() {
 
           {isLoaded && !isSignedIn && (
             <div className="flex flex-col gap-2 pt-3 px-1" style={{ borderTop: "1px solid var(--color-border-subtle)" }}>
-              <Link
-                href="/sign-in"
-                className="btn-ghost w-full"
-                style={{ fontSize: 14, padding: "10px 12px", textAlign: "center" }}
-                onClick={() => setMobileOpen(false)}
-              >
+              <Button variant="secondary" href="/sign-in" onClick={() => setMobileOpen(false)} style={{ width: "100%", justifyContent: "center" }}>
                 {t("signIn")}
-              </Link>
-              <Link
-                href="/sign-up"
-                className="btn-primary w-full"
-                style={{ fontSize: 14, padding: "10px 12px", textAlign: "center" }}
-                onClick={() => setMobileOpen(false)}
-              >
+              </Button>
+              <Button variant="primary" arrow href="/sign-up" onClick={() => setMobileOpen(false)} style={{ width: "100%", justifyContent: "center" }}>
                 {t("tryFree")}
-              </Link>
+              </Button>
             </div>
           )}
         </nav>
