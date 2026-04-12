@@ -106,7 +106,7 @@ export function DocumentsSection() {
                 <p className={styles.docName}>{doc.name}</p>
                 <p className={styles.docDesc}>{doc.desc}</p>
                 {doc.dest && <p className={styles.docDest}>{doc.dest}</p>}
-                <Button variant="primary" size="sm" arrow href="/dashboard/new">
+                <Button variant="primary" size="sm" arrow href="/dashboard/new" style={{ padding: "6px 14px", fontSize: 12, outline: "none" }}>
                   Tạo
                 </Button>
               </div>
