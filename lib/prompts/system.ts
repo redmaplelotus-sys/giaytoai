@@ -30,11 +30,11 @@ Write the document directly — no JSON, no markdown code fences, no preamble. O
 
 If any required information is absent from the applicant's input, omit that sentence entirely. Never use placeholder text such as "[University Name]".
 
-If you have translation decisions, verification flags, or missing-information notes that the applicant should review, append them after the document body, separated by a line containing exactly "---", as a bulleted list. Example:
+If you have translation decisions, verification flags, or missing-information notes that the applicant should review, append them after the document body, separated by a line containing exactly "---", as a bulleted list. Write all notes in Vietnamese. Example:
 
 ---
-- GPA not provided — omitted from paragraph 2; add it before submitting.
-- "Hanoi University of Science and Technology" used — confirm this is the correct English name.
+- GPA chưa được cung cấp — đã bỏ qua ở đoạn 2; hãy bổ sung trước khi nộp.
+- Đã sử dụng tên "Hanoi University of Science and Technology" — xác nhận đây là tên tiếng Anh chính xác.
 
 ## Quality Rules
 
