@@ -98,7 +98,7 @@ export async function checkContentSafety(
     return {
       verdict: "warn",
       flags: ["Safety check response could not be parsed"],
-      reason: "Automated safety check encountered an internal error.",
+      reason: "Kiểm tra an toàn tự động gặp lỗi nội bộ.",
       model,
     };
   }

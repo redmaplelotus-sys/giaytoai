@@ -78,7 +78,7 @@ export function useRefinement(
       });
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
-      setState((s) => ({ ...s, status: "error", error: "Connection failed." }));
+      setState((s) => ({ ...s, status: "error", error: "Kết nối thất bại." }));
       return;
     }
 
@@ -95,7 +95,7 @@ export function useRefinement(
     const isAnalysis   = ANALYSIS_ACTIONS.has(action);
     const reader       = response.body?.getReader();
     if (!reader) {
-      setState((s) => ({ ...s, status: "error", error: "No response body." }));
+      setState((s) => ({ ...s, status: "error", error: "Máy chủ không trả về dữ liệu." }));
       return;
     }
 
@@ -179,7 +179,7 @@ export function useRefinement(
       }
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
-      setState((s) => ({ ...s, status: "error", error: "Stream interrupted." }));
+      setState((s) => ({ ...s, status: "error", error: "Kết nối bị gián đoạn." }));
     } finally {
       reader.releaseLock();
     }

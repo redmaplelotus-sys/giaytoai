@@ -163,7 +163,7 @@ export function DocumentToolbar({
         posthog.capture("draft_downloaded", { draft_id: draftId, format: "pdf" });
         setExportState({ format: null, status: "idle", error: null });
       } catch {
-        setExportState({ format, status: "error", error: "PDF export failed." });
+        setExportState({ format, status: "error", error: "Xuất PDF thất bại." });
       }
       return;
     }
@@ -194,7 +194,7 @@ export function DocumentToolbar({
       a.click();
       document.body.removeChild(a);
     } catch {
-      setExportState({ format, status: "error", error: "Download failed." });
+      setExportState({ format, status: "error", error: "Tải xuống thất bại." });
       return;
     }
 

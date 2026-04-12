@@ -100,7 +100,7 @@ export function useGenerateStream(editor: Editor | null) {
         setState((s) => ({
           ...s,
           phase: "error",
-          error: "Could not reach the server. Check your connection.",
+          error: "Không thể kết nối máy chủ. Vui lòng kiểm tra kết nối mạng.",
           timing: { ...s.timing, totalMs: Date.now() - startMsRef.current },
         }));
         return;
@@ -133,7 +133,7 @@ export function useGenerateStream(editor: Editor | null) {
         setState((s) => ({
           ...s,
           phase: "error",
-          error: "Server returned no response body.",
+          error: "Máy chủ không trả về dữ liệu.",
         }));
         return;
       }
@@ -186,7 +186,7 @@ export function useGenerateStream(editor: Editor | null) {
         setState((s) => ({
           ...s,
           phase: "error",
-          error: "Stream interrupted unexpectedly.",
+          error: "Kết nối bị gián đoạn. Vui lòng thử lại.",
           timing: { ...s.timing, totalMs: Date.now() - startMsRef.current },
         }));
       } finally {
@@ -300,7 +300,7 @@ export function useGenerateStream(editor: Editor | null) {
             setState((s) => ({
               ...s,
               phase: "error",
-              error: (data.message as string) ?? "Generation failed.",
+              error: (data.message as string) ?? "Tạo tài liệu thất bại.",
               timing: {
                 ...s.timing,
                 totalMs: Date.now() - startMsRef.current,
