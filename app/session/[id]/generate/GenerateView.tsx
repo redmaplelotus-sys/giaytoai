@@ -6,13 +6,28 @@ import { useEditor, EditorContent } from "@tiptap/react";
 // ---------------------------------------------------------------------------
 // Backwards-compat helper: old drafts were saved as raw JSON. Extract body.
 // ---------------------------------------------------------------------------
+function textToHtml(text: string): string {
+  return text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
 function extractDraftText(raw: string): string {
-  if (!raw.trimStart().startsWith("{")) return raw;
-  try {
-    const parsed = JSON.parse(raw) as { body?: string };
-    if (typeof parsed.body === "string") return parsed.body;
-  } catch { /* not JSON */ }
-  return raw;
+  let text = raw;
+  if (text.trimStart().startsWith("{")) {
+    try {
+      const parsed = JSON.parse(text) as { body?: string };
+      if (typeof parsed.body === "string") text = parsed.body;
+    } catch { /* not JSON */ }
+  }
+  // Convert plain text to HTML paragraphs if it doesn't look like HTML
+  if (!text.trimStart().startsWith("<")) {
+    return textToHtml(text);
+  }
+  return text;
 }
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";

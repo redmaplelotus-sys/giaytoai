@@ -202,9 +202,17 @@ export async function POST(
         const claudeNotes   = notesSepMatch ? notesSepMatch[1].trim() : undefined;
         const cleanText     = notesSepMatch ? saveText.slice(0, notesSepMatch.index).trim() : saveText;
 
+        // Convert plain text to HTML paragraphs for proper rendering.
+        const cleanHtml = cleanText
+          .split(/\n{2,}/)
+          .map((p: string) => p.trim())
+          .filter(Boolean)
+          .map((p: string) => `<p>${p.replace(/\n/g, "<br>")}</p>`)
+          .join("");
+
         await completeDraft(
           draftId,
-          { text: cleanText, ...(claudeNotes ? { notes: claudeNotes } : {}) },
+          { text: cleanText, html: cleanHtml, ...(claudeNotes ? { notes: claudeNotes } : {}) },
           "claude-opus-4-6",
           doneChunk.inputTokens + doneChunk.outputTokens,
         );
