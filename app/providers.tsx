@@ -9,6 +9,7 @@ import { useEffect, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { clientEnv } from "@/lib/env";
 import { SentryUserContext } from "@/app/components/SentryUserContext";
+import { setFieldLocale } from "@/lib/session/field-meta";
 
 if (typeof window !== "undefined" && clientEnv.posthogKey) {
   posthog.init(clientEnv.posthogKey, {
@@ -45,6 +46,7 @@ interface ProvidersProps {
 }
 
 export function Providers({ children, locale, messages }: ProvidersProps) {
+  setFieldLocale(locale);
   return (
     <ClerkProvider
       localization={viVN}
