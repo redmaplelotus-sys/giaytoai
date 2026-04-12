@@ -37,7 +37,7 @@ export default async function SessionPage({
     <AnswersForm
       sessionId={id}
       slug={slug}
-      docTypeName={session.document_types?.name_en ?? slug}
+      docTypeName={session.document_types?.name_vi ?? session.document_types?.name_en ?? slug}
       requiredFields={template.requiredFields}
       initialAnswers={initialAnswers}
     />

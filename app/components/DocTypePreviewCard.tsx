@@ -120,7 +120,7 @@ export function DocTypePreviewCard({ slug }: DocTypePreviewCardProps) {
 
         {/* "Sample preview" label */}
         <div className="relative z-10 flex justify-center py-3">
-          <span className="text-xs" style={{ color: "var(--color-text-hint)" }}>sample preview</span>
+          <span className="text-xs" style={{ color: "var(--color-text-hint)" }}>xem trước mẫu</span>
         </div>
       </div>
     </div>
