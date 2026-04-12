@@ -199,7 +199,7 @@ export function Navbar() {
       style={{ position: "sticky", top: 0, zIndex: 100 }}
     >
       <div
-        className="page-container"
+        className="page-container-wide"
         style={{ display: "flex", alignItems: "center", height: 84, gap: 16 }}
       >
         {/* Logo */}
@@ -272,7 +272,7 @@ export function Navbar() {
         }}
       >
         <nav
-          className="page-container py-3 flex flex-col gap-1"
+          className="page-container-wide py-3 flex flex-col gap-1"
           aria-label="Mobile navigation"
         >
           {links.map((key) => {
