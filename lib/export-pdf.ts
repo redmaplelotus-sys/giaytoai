@@ -34,18 +34,25 @@ export async function exportToPdf(
   // Explicit px widths are required because html2canvas ignores CSS max-width.
   const CONTENT_WIDTH_PX = 794; // A4 at 96 dpi (210 mm)
 
+  // Create an off-screen container. We use absolute positioning with
+  // overflow:hidden on a clipping parent so html2canvas can measure
+  // layout properly (position:fixed + left:-9999px causes blank renders
+  // in some browsers).
+  const clip = document.createElement("div");
+  clip.style.cssText = "position:absolute;top:0;left:0;width:0;height:0;overflow:hidden;z-index:-1;";
+
   const wrapper = document.createElement("div");
   wrapper.style.cssText = [
     `width:${CONTENT_WIDTH_PX}px`,
-    "position:fixed",
-    "top:0",
-    "left:-9999px",
     "background:#ffffff",
     "color:#111111",
+    "padding:0",
+    "margin:0",
   ].join(";");
 
   wrapper.innerHTML = buildHtml(html, authorName, CONTENT_WIDTH_PX);
-  document.body.appendChild(wrapper);
+  clip.appendChild(wrapper);
+  document.body.appendChild(clip);
 
   try {
     // html2pdf() returns a Worker (not a Promise directly); cast to escape type constraints
@@ -63,6 +70,8 @@ export async function exportToPdf(
           backgroundColor: "#ffffff",
           width:           CONTENT_WIDTH_PX,
           windowWidth:     CONTENT_WIDTH_PX,
+          scrollX:         0,
+          scrollY:         0,
         },
         jsPDF:     { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: { mode: ["avoid-all", "css"] },
@@ -70,7 +79,7 @@ export async function exportToPdf(
       .from(wrapper)
       .save();
   } finally {
-    document.body.removeChild(wrapper);
+    document.body.removeChild(clip);
   }
 }
 
