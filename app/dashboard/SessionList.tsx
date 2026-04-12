@@ -20,7 +20,7 @@ type ExportRow = { id: string; format: string; r2_key: string | null; created_at
 // ---------------------------------------------------------------------------
 
 const DESTINATION_FLAGS: Record<string, string> = {
-  au: "🇦🇺", us: "🇺🇸", uk: "🇬🇧", ko: "🇰🇷", cn: "🇨🇳",
+  au: "🇦🇺", us: "🇺🇸", uk: "🇬🇧", ko: "🇰🇷", cn: "🇨🇳", tw: "🇹🇼",
   ca: "🇨🇦", de: "🇩🇪", jp: "🇯🇵", vn: "🇻🇳", sg: "🇸🇬", fr: "🇫🇷",
 };
 

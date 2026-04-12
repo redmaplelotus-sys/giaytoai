@@ -283,6 +283,7 @@ const vi = {
     uk: "Anh",
     ko: "Hàn Quốc",
     cn: "Trung Quốc",
+    tw: "Đài Loan",
     ca: "Canada",
     de: "Đức",
     jp: "Nhật Bản",

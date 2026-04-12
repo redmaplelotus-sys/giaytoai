@@ -278,6 +278,7 @@ const zh: Translations = {
     uk: "英国",
     ko: "韩国",
     cn: "中国",
+    tw: "台湾",
     ca: "加拿大",
     de: "德国",
     jp: "日本",

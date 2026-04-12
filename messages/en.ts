@@ -284,6 +284,7 @@ const en: Translations = {
     uk: "UK",
     ko: "Korea",
     cn: "China",
+    tw: "Taiwan",
     ca: "Canada",
     de: "Germany",
     jp: "Japan",

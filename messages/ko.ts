@@ -279,6 +279,7 @@ const ko: Translations = {
     uk: "영국",
     ko: "한국",
     cn: "중국",
+    tw: "대만",
     ca: "캐나다",
     de: "독일",
     jp: "일본",
