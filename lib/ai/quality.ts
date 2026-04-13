@@ -39,17 +39,19 @@ Analyse the supplied draft and return a JSON object with this exact shape:
   "word_count_actual": <integer>,
   "target_word_count": <integer or null if not provided>,
   "tone_score": <1–5>,
-  "tone_note": "<one sentence>",
+  "tone_note": "<one sentence in Vietnamese>",
   "specificity_score": <1–5>,
-  "warnings": ["<string>", ...],
-  "strengths": ["<string>", ...]
+  "warnings": ["<string in Vietnamese>", ...],
+  "strengths": ["<string in Vietnamese>", ...]
 }
+
+IMPORTANT: All text values (tone_note, warnings, strengths) MUST be written in Vietnamese.
 
 Scoring guides:
 - tone_score 5 = register is exactly right for destination and document type; 1 = clearly wrong register (e.g. casual for a UCAS statement).
 - specificity_score 5 = named institutions, projects, dates, outcomes; 1 = nothing but generic claims.
-- warnings: flag forbidden phrases, missing required sections, vague claims, self-deprecating language, over-word-count, under-word-count (>5% off target), placeholders left in body.
-- strengths: genuine positives only — do not pad.
+- warnings: flag forbidden phrases, missing required sections, vague claims, self-deprecating language, over-word-count, under-word-count (>5% off target), placeholders left in body. Write in Vietnamese.
+- strengths: genuine positives only — do not pad. Write in Vietnamese.
 
 Return valid JSON only. No text outside the JSON object.\
 `;
