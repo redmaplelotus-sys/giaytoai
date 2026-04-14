@@ -3,12 +3,14 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getStripe, CREDIT_PACKS } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 // ---------------------------------------------------------------------------
 // POST /api/checkout
 //
 // Body: { packId: "starter" | "standard" | "pro" | "unlimited" }
 // Returns: { url: string } — Stripe Checkout session URL
+// Rate limit: 5 requests per 5 minutes
 // ---------------------------------------------------------------------------
 
 export async function POST(request: NextRequest) {
@@ -16,6 +18,9 @@ export async function POST(request: NextRequest) {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const rl = await checkRateLimit("checkout", userId, request);
+  if (!rl.allowed) return rateLimitResponse(rl);
 
   let body: { packId?: string };
   try {
