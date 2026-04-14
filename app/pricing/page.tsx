@@ -6,25 +6,34 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 
 // ---------------------------------------------------------------------------
-// Pack definitions (must match lib/stripe.ts CREDIT_PACKS)
+// Pack definitions
 // ---------------------------------------------------------------------------
 
 interface PackDef {
   id: string;
   name: string;
-  credits: number | null; // null = unlimited
-  priceUsd: number; // cents
+  credits: number | null;
+  price: string;
   perDoc: string;
   popular: boolean;
   recurring: boolean;
 }
 
-const PACKS: PackDef[] = [
-  { id: "starter",   name: "Starter",   credits: 5,    priceUsd: 400,  perDoc: "$0.80", popular: false, recurring: false },
-  { id: "standard",  name: "Standard",  credits: 15,   priceUsd: 800,  perDoc: "$0.53", popular: true,  recurring: false },
-  { id: "pro",       name: "Pro",       credits: 40,   priceUsd: 1600, perDoc: "$0.40", popular: false, recurring: false },
-  { id: "unlimited", name: "Unlimited", credits: null,  priceUsd: 1200, perDoc: "",      popular: false, recurring: true  },
+const USD_PACKS: PackDef[] = [
+  { id: "starter",   name: "Starter",   credits: 5,    price: "$4",       perDoc: "$0.80",  popular: false, recurring: false },
+  { id: "standard",  name: "Standard",  credits: 15,   price: "$8",       perDoc: "$0.53",  popular: true,  recurring: false },
+  { id: "pro",       name: "Pro",       credits: 40,   price: "$16",      perDoc: "$0.40",  popular: false, recurring: false },
+  { id: "unlimited", name: "Unlimited", credits: null,  price: "$12",      perDoc: "",       popular: false, recurring: true  },
 ];
+
+const VND_PACKS: PackDef[] = [
+  { id: "starter",   name: "Starter",   credits: 5,    price: "49.000₫",  perDoc: "9.800₫", popular: false, recurring: false },
+  { id: "standard",  name: "Standard",  credits: 15,   price: "99.000₫",  perDoc: "6.600₫", popular: true,  recurring: false },
+  { id: "pro",       name: "Pro",       credits: 40,   price: "199.000₫", perDoc: "4.975₫", popular: false, recurring: false },
+  { id: "unlimited", name: "Unlimited", credits: null,  price: "299.000₫", perDoc: "",       popular: false, recurring: true  },
+];
+
+type Currency = "vnd" | "usd";
 
 // ---------------------------------------------------------------------------
 // Component
@@ -33,8 +42,11 @@ const PACKS: PackDef[] = [
 export default function PricingPage() {
   const { isSignedIn } = useUser();
   const router = useRouter();
+  const [currency, setCurrency] = useState<Currency>("vnd");
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const packs = currency === "vnd" ? VND_PACKS : USD_PACKS;
 
   async function handleBuy(packId: string) {
     if (!isSignedIn) {
@@ -45,8 +57,10 @@ export default function PricingPage() {
     setError(null);
     setLoadingPack(packId);
 
+    const endpoint = currency === "vnd" ? "/api/checkout/payos" : "/api/checkout";
+
     try {
-      const res = await fetch("/api/checkout", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ packId }),
@@ -57,8 +71,9 @@ export default function PricingPage() {
         throw new Error((data as { error?: string }).error ?? `Error ${res.status}`);
       }
 
-      const { url } = await res.json() as { url: string };
-      window.location.href = url;
+      const data = await res.json() as { url?: string; checkoutUrl?: string };
+      const redirectUrl = data.url ?? data.checkoutUrl;
+      if (redirectUrl) window.location.href = redirectUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Có lỗi xảy ra");
       setLoadingPack(null);
@@ -68,13 +83,52 @@ export default function PricingPage() {
   return (
     <main style={{ width: "100%", maxWidth: 1100, marginLeft: "auto", marginRight: "auto", paddingTop: 48, paddingBottom: 64, paddingLeft: "clamp(20px, 4vw, 48px)", paddingRight: "clamp(20px, 4vw, 48px)" }}>
       {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: 48 }}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
         <h1 style={{ fontSize: 28, fontWeight: 700, color: "#1B3A5C", letterSpacing: "-0.02em", marginBottom: 8 }}>
           Bảng giá
         </h1>
         <p style={{ fontSize: 15, color: "#5F5E5A", maxWidth: 480, margin: "0 auto" }}>
           Mỗi lượt = 1 tài liệu hoàn chỉnh. Không cần đăng ký hàng tháng.
         </p>
+      </div>
+
+      {/* Currency toggle */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 4, marginBottom: 32 }}>
+        <button
+          type="button"
+          onClick={() => setCurrency("vnd")}
+          style={{
+            padding: "8px 20px",
+            borderRadius: "20px 0 0 20px",
+            border: "1.5px solid #1B3A5C",
+            background: currency === "vnd" ? "#1B3A5C" : "#fff",
+            color: currency === "vnd" ? "#fff" : "#1B3A5C",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+        >
+          🇻🇳 VND
+        </button>
+        <button
+          type="button"
+          onClick={() => setCurrency("usd")}
+          style={{
+            padding: "8px 20px",
+            borderRadius: "0 20px 20px 0",
+            border: "1.5px solid #1B3A5C",
+            borderLeft: "none",
+            background: currency === "usd" ? "#1B3A5C" : "#fff",
+            color: currency === "usd" ? "#fff" : "#1B3A5C",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+        >
+          🌍 USD
+        </button>
       </div>
 
       {/* Free tier callout */}
@@ -94,9 +148,8 @@ export default function PricingPage() {
 
       {/* Pack grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20, marginBottom: 32 }}>
-        {PACKS.map((pack) => {
+        {packs.map((pack) => {
           const isLoading = loadingPack === pack.id;
-          const priceDisplay = `$${(pack.priceUsd / 100).toFixed(0)}`;
 
           return (
             <div
@@ -144,12 +197,10 @@ export default function PricingPage() {
 
               <div>
                 <span style={{ fontSize: 32, fontWeight: 700, color: "#1B3A5C" }}>
-                  {priceDisplay}
+                  {pack.price}
                 </span>
-                {pack.recurring ? (
+                {pack.recurring && (
                   <span style={{ fontSize: 14, color: "#5F5E5A" }}> /tháng</span>
-                ) : (
-                  <span style={{ fontSize: 14, color: "#5F5E5A" }}> USD</span>
                 )}
                 {pack.perDoc && (
                   <p style={{ fontSize: 12, color: "#5F5E5A", marginTop: 4 }}>
@@ -181,7 +232,9 @@ export default function PricingPage() {
 
       {/* Footer note */}
       <p style={{ textAlign: "center", fontSize: 13, color: "#5F5E5A" }}>
-        Thanh toán an toàn qua Stripe · Hỗ trợ Visa, Mastercard, Apple Pay, Google Pay
+        {currency === "vnd"
+          ? "Thanh toán qua chuyển khoản ngân hàng, Momo, ZaloPay · Hỗ trợ tiếng Việt"
+          : "Thanh toán an toàn qua Stripe · Hỗ trợ Visa, Mastercard, Apple Pay, Google Pay"}
       </p>
     </main>
   );
