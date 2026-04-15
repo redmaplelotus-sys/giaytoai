@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
+    locale: "vi",
     mode: pack.recurring ? "subscription" : "payment",
     line_items: [{ price: pack.stripePriceId, quantity: 1 }],
     success_url: `${appUrl}/dashboard?checkout=success&pack=${pack.id}`,
