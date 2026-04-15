@@ -36,7 +36,7 @@ export function LanguageSwitcher() {
     document.cookie = `locale=${code};path=/;max-age=${60 * 60 * 24 * 365}`;
     setCurrent(code);
     setOpen(false);
-    router.refresh();
+    window.location.reload();
   }
 
   const active = LANGUAGES.find((l) => l.code === current) ?? LANGUAGES[0];
