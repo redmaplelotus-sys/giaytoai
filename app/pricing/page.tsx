@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { PayOSCheckout } from "@/components/payment/PayOSCheckout";
 
 // ---------------------------------------------------------------------------
 // Pack definitions
@@ -45,25 +46,32 @@ export default function PricingPage() {
   const [currency, setCurrency] = useState<Currency>("vnd");
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedVndPack, setSelectedVndPack] = useState<PackDef | null>(null);
 
   const packs = currency === "vnd" ? VND_PACKS : USD_PACKS;
 
-  async function handleBuy(packId: string) {
+  async function handleBuy(pack: PackDef) {
     if (!isSignedIn) {
       router.push("/sign-up");
       return;
     }
 
-    setError(null);
-    setLoadingPack(packId);
+    // VND: show inline QR checkout
+    if (currency === "vnd") {
+      setSelectedVndPack(pack);
+      setError(null);
+      return;
+    }
 
-    const endpoint = currency === "vnd" ? "/api/checkout/payos" : "/api/checkout";
+    // USD: redirect to Stripe
+    setError(null);
+    setLoadingPack(pack.id);
 
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packId }),
+        body: JSON.stringify({ packId: pack.id }),
       });
 
       if (!res.ok) {
@@ -71,9 +79,8 @@ export default function PricingPage() {
         throw new Error((data as { error?: string }).error ?? `Error ${res.status}`);
       }
 
-      const data = await res.json() as { url?: string; checkoutUrl?: string };
-      const redirectUrl = data.url ?? data.checkoutUrl;
-      if (redirectUrl) window.location.href = redirectUrl;
+      const data = await res.json() as { url: string };
+      if (data.url) window.location.href = data.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Có lỗi xảy ra");
       setLoadingPack(null);
@@ -96,7 +103,7 @@ export default function PricingPage() {
       <div style={{ display: "flex", justifyContent: "center", gap: 4, marginBottom: 32 }}>
         <button
           type="button"
-          onClick={() => setCurrency("vnd")}
+          onClick={() => { setCurrency("vnd"); setSelectedVndPack(null); }}
           style={{
             padding: "8px 20px",
             borderRadius: "20px 0 0 20px",
@@ -113,7 +120,7 @@ export default function PricingPage() {
         </button>
         <button
           type="button"
-          onClick={() => setCurrency("usd")}
+          onClick={() => { setCurrency("usd"); setSelectedVndPack(null); }}
           style={{
             padding: "8px 20px",
             borderRadius: "0 20px 20px 0",
@@ -150,13 +157,18 @@ export default function PricingPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20, marginBottom: 32 }}>
         {packs.map((pack) => {
           const isLoading = loadingPack === pack.id;
+          const isSelected = selectedVndPack?.id === pack.id;
 
           return (
             <div
               key={pack.id}
               style={{
                 borderRadius: 12,
-                border: pack.popular ? "2px solid #1B3A5C" : "1px solid #E8E8E4",
+                border: isSelected
+                  ? "2px solid #185FA5"
+                  : pack.popular
+                    ? "2px solid #1B3A5C"
+                    : "1px solid #E8E8E4",
                 background: "#fff",
                 padding: "28px 24px",
                 display: "flex",
@@ -165,7 +177,7 @@ export default function PricingPage() {
                 position: "relative",
               }}
             >
-              {pack.popular && (
+              {pack.popular && !isSelected && (
                 <span style={{
                   position: "absolute",
                   top: -11,
@@ -212,16 +224,28 @@ export default function PricingPage() {
               <Button
                 variant={pack.popular ? "primary" : "secondary"}
                 arrow={pack.popular}
-                onClick={() => handleBuy(pack.id)}
+                onClick={() => handleBuy(pack)}
                 disabled={!!loadingPack}
                 style={{ width: "100%", justifyContent: "center", marginTop: "auto" }}
               >
-                {isLoading ? "Đang xử lý…" : "Mua ngay"}
+                {isLoading ? "Đang xử lý…" : isSelected ? "Đã chọn" : "Mua ngay"}
               </Button>
             </div>
           );
         })}
       </div>
+
+      {/* Inline PayOS QR checkout */}
+      {selectedVndPack && currency === "vnd" && (
+        <div style={{ maxWidth: 420, margin: "0 auto 32px" }}>
+          <PayOSCheckout
+            packId={selectedVndPack.id}
+            packName={selectedVndPack.name}
+            priceLabel={selectedVndPack.price}
+            credits={selectedVndPack.credits}
+          />
+        </div>
+      )}
 
       {/* Error */}
       {error && (
