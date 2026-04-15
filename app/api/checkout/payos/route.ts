@@ -37,8 +37,9 @@ export async function POST(request: NextRequest) {
   const payos = getPayOS();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-  // Generate a unique numeric order code (PayOS requires a number)
-  const orderCode = Date.now() % 1_000_000_000;
+  // Generate a unique numeric order code (PayOS requires a number, under 8 digits)
+  // Last 4 digits of timestamp + 3-digit random suffix = max 9999999
+  const orderCode = (Date.now() % 10000) * 1000 + Math.floor(Math.random() * 1000);
 
   // ── Record pending order in DB ──────────────────────────────────────────
   await supabaseAdmin
