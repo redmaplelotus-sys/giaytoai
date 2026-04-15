@@ -38,6 +38,7 @@ import { PollingQualityBadges } from "@/app/components/QualityBadges";
 import { RefinementToolbar } from "@/app/components/RefinementToolbar";
 import { DocumentToolbar } from "@/app/components/DocumentToolbar";
 import { FeedbackPanel } from "@/components/editor/FeedbackPanel";
+import { OutOfCreditsModal } from "@/components/payment/OutOfCreditsModal";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -202,6 +203,7 @@ export function GenerateView({ sessionId, targetWordCount, docTypeSlug = "" }: {
 
   const [showTranslation, setShowTranslation] = useState(false);
   const [translationText, setTranslationText] = useState<string | null>(null);
+  const [showCreditsModal, setShowCreditsModal] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -222,6 +224,12 @@ export function GenerateView({ sessionId, targetWordCount, docTypeSlug = "" }: {
   const { state, generate, abort } = useGenerateStream(editor);
   const { phase, safety, quality, timing, error, draftId, inputTokens, outputTokens } = state;
   const isStreaming = phase === "connecting" || phase === "streaming";
+  const isNoCredits = phase === "error" && error === "no_credits";
+
+  // Show credits modal automatically when no_credits error occurs
+  useEffect(() => {
+    if (isNoCredits) setShowCreditsModal(true);
+  }, [isNoCredits]);
 
   const [saving, setSaving] = useState(false);
   const saveVersion = useCallback(async () => {
@@ -340,7 +348,7 @@ export function GenerateView({ sessionId, targetWordCount, docTypeSlug = "" }: {
               {t("done")}
             </span>
           )}
-          {phase === "error" && (
+          {phase === "error" && !isNoCredits && (
             <span className="text-sm truncate" style={{ color: "var(--color-red)" }}>{error}</span>
           )}
         </div>
@@ -496,6 +504,14 @@ export function GenerateView({ sessionId, targetWordCount, docTypeSlug = "" }: {
             <>v{activeIndex + 1} of {revisions.length}</>
           )}
         </p>
+      )}
+
+      {/* ── Out of credits modal ── */}
+      {showCreditsModal && (
+        <OutOfCreditsModal
+          documentPreview={activeRevision?.text ? editor?.getText() ?? undefined : undefined}
+          onDismiss={() => setShowCreditsModal(false)}
+        />
       )}
     </div>
   );
