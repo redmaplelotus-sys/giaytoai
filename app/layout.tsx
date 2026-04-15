@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/app/providers";
 import { Navbar } from "@/components/layout/Navbar";
@@ -42,7 +43,8 @@ async function loadMessages(locale: string): Promise<Record<string, unknown>> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const locale = DEFAULT_LOCALE;
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("locale")?.value ?? DEFAULT_LOCALE;
   const messages = await loadMessages(locale);
 
   return (

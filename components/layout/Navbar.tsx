@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/Button";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 
 // ---------------------------------------------------------------------------
 // Credit pill
@@ -239,11 +240,13 @@ export function Navbar() {
                 {t("createDoc")}
               </Button>
               <CreditPill />
+              <LanguageSwitcher />
               <UserButton />
             </>
           )}
           {isLoaded && !isSignedIn && (
             <>
+              <LanguageSwitcher />
               <Button variant="ghost" size="sm" href="/sign-in" style={{ fontSize: 13, padding: "6px 12px" }}>
                 {t("signIn")}
               </Button>
@@ -254,9 +257,10 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Mobile: credit pill + hamburger */}
+        {/* Mobile: credit pill + language + hamburger */}
         <div className="flex md:hidden items-center gap-2 ml-auto">
           {isLoaded && isSignedIn && <CreditPill />}
+          <LanguageSwitcher />
           <Hamburger open={mobileOpen} onClick={() => setMobileOpen((v) => !v)} />
         </div>
       </div>
