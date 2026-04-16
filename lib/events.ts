@@ -98,7 +98,6 @@ export async function onDraftExported(payload: DraftExportedPayload): Promise<vo
   try {
     await scheduleOutcomeEmail.trigger({
       userId:    payload.userId,
-      draftId:   payload.draftId,
       sessionId: payload.sessionId,
       format:    payload.format,
     });

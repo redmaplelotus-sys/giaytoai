@@ -6,11 +6,13 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 //
 // Called from lib/events.ts onDraftExported(). Inserts a row into
 // outcome_emails with send_at = now + 56 days.
+//
+// Table columns: id, session_id, user_id, resend_id, type, sent_at,
+//                created_at, send_at
 // ---------------------------------------------------------------------------
 
 export interface ScheduleOutcomeEmailPayload {
   userId: string;
-  draftId: string;
   sessionId: string;
   format: string;
 }
@@ -24,16 +26,14 @@ export const scheduleOutcomeEmail = task({
       .from("outcome_emails")
       .insert({
         user_id: payload.userId,
-        draft_id: payload.draftId,
         session_id: payload.sessionId,
-        format: payload.format,
+        type: "outcome_feedback",
         send_at: sendAt,
-        status: "pending",
       });
 
     if (error) {
       console.error("[schedule-outcome-email] insert failed:", error);
-      throw error; // retry via trigger config
+      throw error;
     }
 
     return { scheduled: sendAt };

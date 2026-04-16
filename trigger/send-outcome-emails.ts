@@ -3,8 +3,11 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { Resend } from "resend";
 
 // ---------------------------------------------------------------------------
-// Job B: Hourly cron — find pending outcome emails where send_at <= now,
-// send via Resend, mark as sent.
+// Job B: Hourly cron — find pending outcome emails where send_at <= now
+// (sent_at is null = not yet sent), send via Resend, mark as sent.
+//
+// Table columns: id, session_id, user_id, resend_id, type, sent_at,
+//                created_at, send_at
 // ---------------------------------------------------------------------------
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -14,11 +17,12 @@ export const sendOutcomeEmails = schedules.task({
   id: "send-outcome-emails",
   cron: "0 * * * *", // every hour
   run: async () => {
-    // Find pending emails ready to send
+    // Find unsent emails ready to send (sent_at IS NULL = pending)
     const { data: emails, error } = await supabaseAdmin
       .from("outcome_emails")
-      .select("id, user_id, draft_id, session_id")
-      .eq("status", "pending")
+      .select("id, user_id, session_id, type")
+      .is("sent_at", null)
+      .not("send_at", "is", null)
       .lte("send_at", new Date().toISOString())
       .limit(50);
 
@@ -43,10 +47,10 @@ export const sendOutcomeEmails = schedules.task({
           .single();
 
         if (!user?.email) {
-          // No email — mark as skipped
+          // No email — mark as sent to skip permanently
           await supabaseAdmin
             .from("outcome_emails")
-            .update({ status: "skipped" })
+            .update({ sent_at: new Date().toISOString(), resend_id: "skipped_no_email" })
             .eq("id", email.id);
           continue;
         }
@@ -64,26 +68,29 @@ export const sendOutcomeEmails = schedules.task({
         const docTypeName = dt?.name_vi ?? dt?.name_en ?? "tài liệu";
 
         // Send email via Resend
-        await resend.emails.send({
+        const result = await resend.emails.send({
           from: FROM_EMAIL,
           to: user.email,
           subject: `Kết quả hồ sơ của bạn — ${docTypeName}`,
           html: buildOutcomeEmailHtml(docTypeName, email.session_id),
         });
 
-        // Mark as sent
+        // Mark as sent with Resend message ID
         await supabaseAdmin
           .from("outcome_emails")
-          .update({ status: "sent", sent_at: new Date().toISOString() })
+          .update({
+            sent_at: new Date().toISOString(),
+            resend_id: result.data?.id ?? "sent",
+          })
           .eq("id", email.id);
 
         sentCount++;
       } catch (err) {
         console.error(`[send-outcome-emails] failed for ${email.id}:`, err);
-        // Mark as failed — don't retry this specific email
+        // Mark with error resend_id so we don't retry endlessly
         await supabaseAdmin
           .from("outcome_emails")
-          .update({ status: "failed" })
+          .update({ resend_id: "error" })
           .eq("id", email.id);
       }
     }
