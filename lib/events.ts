@@ -11,6 +11,7 @@
 
 import { PostHog } from "posthog-node";
 import { clientEnv } from "@/lib/env";
+import { scheduleOutcomeEmail } from "@/trigger/schedule-outcome-email";
 
 // ---------------------------------------------------------------------------
 // PostHog server client (singleton, lazy)
@@ -91,5 +92,17 @@ export async function onDraftExported(payload: DraftExportedPayload): Promise<vo
     await ph()?.shutdown();
   } catch {
     // Analytics failure must never propagate to the user
+  }
+
+  // Schedule outcome feedback email 56 days from now
+  try {
+    await scheduleOutcomeEmail.trigger({
+      userId:    payload.userId,
+      draftId:   payload.draftId,
+      sessionId: payload.sessionId,
+      format:    payload.format,
+    });
+  } catch {
+    // Background job failure must never block the export
   }
 }
