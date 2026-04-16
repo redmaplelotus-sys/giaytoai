@@ -23,6 +23,8 @@
     "@tiptap/extension-placeholder": "^3.22.3",
     "@tiptap/react": "^3.22.3",
     "@tiptap/starter-kit": "^3.22.3",
+    "@trigger.dev/nextjs": "^3.3.12",
+    "@trigger.dev/sdk": "^4.4.4",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.37.0",
     "docx": "^9.6.1",
