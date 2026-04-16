@@ -1,7 +1,7 @@
 import { defineConfig } from "@trigger.dev/sdk/v3";
 
 export default defineConfig({
-  project: "giaytoai",
+  project: "proj_wdzpchydgdwyoabenbfi",
   runtime: "node",
   maxDuration: 300,
   retries: {
