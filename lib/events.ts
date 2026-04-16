@@ -12,6 +12,7 @@
 import { PostHog } from "posthog-node";
 import { clientEnv } from "@/lib/env";
 import { scheduleOutcomeEmail } from "@/trigger/schedule-outcome-email";
+import { trackDraftEdits } from "@/trigger/track-draft-edits";
 
 // ---------------------------------------------------------------------------
 // PostHog server client (singleton, lazy)
@@ -55,6 +56,8 @@ export interface DraftDownloadedPayload {
   draftId:   string;
   sessionId: string;
   format:    "docx" | "html" | "bilingual" | "pdf";
+  /** The final editor text at time of download (for edit tracking). */
+  finalText?: string;
 }
 
 export async function onDraftDownloaded(payload: DraftDownloadedPayload): Promise<void> {
@@ -72,6 +75,20 @@ export async function onDraftDownloaded(payload: DraftDownloadedPayload): Promis
     await ph()?.shutdown();
   } catch {
     // Analytics failure must never propagate to the user
+  }
+
+  // Track edits: compare original AI text vs final downloaded text
+  if (payload.finalText) {
+    try {
+      await trackDraftEdits.trigger({
+        userId:    payload.userId,
+        draftId:   payload.draftId,
+        sessionId: payload.sessionId,
+        finalText: payload.finalText,
+      });
+    } catch {
+      // Background job failure must never block the download
+    }
   }
 }
 

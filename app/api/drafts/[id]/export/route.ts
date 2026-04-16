@@ -130,7 +130,9 @@ export async function POST(
   await saveExport(draftId, draft.session_id, userId, dbFormat, key);
 
   // ── Fire domain events (non-blocking) ────────────────────────────────────
-  void onDraftDownloaded({ userId, draftId, sessionId: draft.session_id, format: exportFormat });
+  // Strip HTML tags to get plain text for edit tracking
+  const finalText = htmlContent.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  void onDraftDownloaded({ userId, draftId, sessionId: draft.session_id, format: exportFormat, finalText });
   void onDraftExported({
     userId,
     draftId,
