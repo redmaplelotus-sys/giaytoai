@@ -39,7 +39,7 @@ export const sendOutcomeEmails = schedules.task({
 
     for (const email of emails) {
       try {
-        // Fetch user email
+        // Fetch user email and locale
         const { data: user } = await supabaseAdmin
           .from("users")
           .select("email, locale")
@@ -47,7 +47,6 @@ export const sendOutcomeEmails = schedules.task({
           .single();
 
         if (!user?.email) {
-          // No email — mark as sent to skip permanently
           await supabaseAdmin
             .from("outcome_emails")
             .update({ sent_at: new Date().toISOString(), resend_id: "skipped_no_email" })
@@ -65,17 +64,27 @@ export const sendOutcomeEmails = schedules.task({
         const dt = Array.isArray(session?.document_types)
           ? session.document_types[0]
           : session?.document_types;
-        const docTypeName = dt?.name_vi ?? dt?.name_en ?? "tài liệu";
+        const docNameVi = dt?.name_vi ?? "tài liệu";
+        const docNameEn = dt?.name_en ?? "document";
 
-        // Send email via Resend
+        const locale = user.locale ?? "vi";
+        const isEn = locale === "en";
+
+        const subject = isEn
+          ? `How did your application go? — ${docNameEn}`
+          : `Kết quả hồ sơ của bạn — ${docNameVi}`;
+
+        const html = isEn
+          ? buildEnglishEmail(docNameEn, email.session_id, email.id)
+          : buildVietnameseEmail(docNameVi, email.session_id, email.id);
+
         const result = await resend.emails.send({
           from: FROM_EMAIL,
           to: user.email,
-          subject: `Kết quả hồ sơ của bạn — ${docTypeName}`,
-          html: buildOutcomeEmailHtml(docTypeName, email.session_id),
+          subject,
+          html,
         });
 
-        // Mark as sent with Resend message ID
         await supabaseAdmin
           .from("outcome_emails")
           .update({
@@ -87,7 +96,6 @@ export const sendOutcomeEmails = schedules.task({
         sentCount++;
       } catch (err) {
         console.error(`[send-outcome-emails] failed for ${email.id}:`, err);
-        // Mark with error resend_id so we don't retry endlessly
         await supabaseAdmin
           .from("outcome_emails")
           .update({ resend_id: "error" })
@@ -100,38 +108,114 @@ export const sendOutcomeEmails = schedules.task({
 });
 
 // ---------------------------------------------------------------------------
-// Email template
+// Shared
 // ---------------------------------------------------------------------------
 
-function buildOutcomeEmailHtml(docTypeName: string, sessionId: string): string {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://giaytoai.com";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://giaytoai.com";
+
+type Outcome = "accepted" | "pending" | "rejected" | "changed_plans";
+
+function outcomeUrl(emailId: string, outcome: Outcome): string {
+  return `${APP_URL}/api/outcome?id=${emailId}&outcome=${outcome}`;
+}
+
+function outcomeButtons(emailId: string, labels: Record<Outcome, { text: string; emoji: string }>): string {
+  const btnStyle = (bg: string, border: string) =>
+    `display:inline-block;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;border:2px solid ${border};background:${bg};color:#1B3A5C;margin:4px;`;
 
   return `
-    <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 20px;">
-      <p style="font-size: 15px; color: #1B3A5C; line-height: 1.6;">
+    <div style="text-align:center;margin:24px 0;">
+      <a href="${outcomeUrl(emailId, "accepted")}" style="${btnStyle("#EAF3DE", "#C0DD97")}">
+        ${labels.accepted.emoji} ${labels.accepted.text}
+      </a>
+      <a href="${outcomeUrl(emailId, "pending")}" style="${btnStyle("#E6F1FB", "#B5D4F4")}">
+        ${labels.pending.emoji} ${labels.pending.text}
+      </a>
+      <br/>
+      <a href="${outcomeUrl(emailId, "rejected")}" style="${btnStyle("#FEF8EE", "#FAC775")}">
+        ${labels.rejected.emoji} ${labels.rejected.text}
+      </a>
+      <a href="${outcomeUrl(emailId, "changed_plans")}" style="${btnStyle("#F7F7F5", "#D4D4CE")}">
+        ${labels.changed_plans.emoji} ${labels.changed_plans.text}
+      </a>
+    </div>
+  `;
+}
+
+function footer(): string {
+  return `
+    <hr style="border:none;border-top:1px solid #E8E8E4;margin:24px 0;" />
+    <p style="font-size:11px;color:#999;">
+      Giấy Tờ AI · Tài liệu quốc tế chuyên nghiệp<br>
+      <a href="${APP_URL}" style="color:#185FA5;">giaytoai.com</a>
+    </p>
+  `;
+}
+
+// ---------------------------------------------------------------------------
+// Vietnamese template
+// ---------------------------------------------------------------------------
+
+function buildVietnameseEmail(docTypeName: string, _sessionId: string, emailId: string): string {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 20px;">
+      <p style="font-size:15px;color:#1B3A5C;line-height:1.6;">
         Xin chào,
       </p>
-      <p style="font-size: 15px; color: #444441; line-height: 1.6;">
+      <p style="font-size:15px;color:#444441;line-height:1.6;">
         Khoảng 2 tháng trước, bạn đã sử dụng Giấy Tờ AI để tạo <strong>${docTypeName}</strong>.
         Chúng tôi rất muốn biết kết quả hồ sơ của bạn!
       </p>
-      <p style="font-size: 15px; color: #444441; line-height: 1.6;">
+      <p style="font-size:14px;color:#5F5E5A;line-height:1.5;">
+        Chỉ cần nhấn một nút bên dưới — không cần đăng nhập:
+      </p>
+
+      ${outcomeButtons(emailId, {
+        accepted:      { text: "Đã được chấp nhận", emoji: "🎉" },
+        pending:       { text: "Đang chờ kết quả",  emoji: "⏳" },
+        rejected:      { text: "Bị từ chối",        emoji: "😔" },
+        changed_plans: { text: "Đã thay đổi kế hoạch", emoji: "🔄" },
+      })}
+
+      <p style="font-size:13px;color:#5F5E5A;line-height:1.5;">
         Phản hồi của bạn giúp chúng tôi cải thiện chất lượng tài liệu cho tất cả người dùng.
+        Cảm ơn bạn!
       </p>
-      <div style="text-align: center; margin: 28px 0;">
-        <a href="${appUrl}/feedback?session=${sessionId}"
-           style="display: inline-block; background: #1B3A5C; color: #fff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px;">
-          Chia sẻ kết quả
-        </a>
-      </div>
-      <p style="font-size: 13px; color: #5F5E5A; line-height: 1.5;">
-        Cảm ơn bạn đã sử dụng Giấy Tờ AI. Chúc bạn thành công!
+      ${footer()}
+    </div>
+  `;
+}
+
+// ---------------------------------------------------------------------------
+// English template
+// ---------------------------------------------------------------------------
+
+function buildEnglishEmail(docTypeName: string, _sessionId: string, emailId: string): string {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 20px;">
+      <p style="font-size:15px;color:#1B3A5C;line-height:1.6;">
+        Hi there,
       </p>
-      <hr style="border: none; border-top: 1px solid #E8E8E4; margin: 24px 0;" />
-      <p style="font-size: 11px; color: #999;">
-        Giấy Tờ AI · Tài liệu quốc tế chuyên nghiệp<br>
-        <a href="${appUrl}" style="color: #185FA5;">giaytoai.com</a>
+      <p style="font-size:15px;color:#444441;line-height:1.6;">
+        About 2 months ago, you used Giấy Tờ AI to create a <strong>${docTypeName}</strong>.
+        We'd love to know how your application went!
       </p>
+      <p style="font-size:14px;color:#5F5E5A;line-height:1.5;">
+        Just tap one button below — no login required:
+      </p>
+
+      ${outcomeButtons(emailId, {
+        accepted:      { text: "Accepted",      emoji: "🎉" },
+        pending:       { text: "Still waiting", emoji: "⏳" },
+        rejected:      { text: "Rejected",      emoji: "😔" },
+        changed_plans: { text: "Changed plans", emoji: "🔄" },
+      })}
+
+      <p style="font-size:13px;color:#5F5E5A;line-height:1.5;">
+        Your feedback helps us improve document quality for everyone.
+        Thank you!
+      </p>
+      ${footer()}
     </div>
   `;
 }
