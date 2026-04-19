@@ -8,11 +8,13 @@ import { deleteFromR2 } from "@/lib/r2";
 // 1. Delete expired R2 exports (> 7 days old)
 // 2. Purge stripe_events older than 30 days
 // 3. Mark abandoned sessions (pending > 7 days)
+// 4. Hard-delete soft-deleted users after 30 days
 // ---------------------------------------------------------------------------
 
 const EXPORT_TTL_DAYS   = 7;
 const STRIPE_TTL_DAYS   = 30;
 const ABANDON_DAYS      = 7;
+const USER_DELETE_DAYS  = 30;
 
 export const dailyCleanup = schedules.task({
   id: "daily-cleanup",
@@ -23,6 +25,7 @@ export const dailyCleanup = schedules.task({
       r2Errors: 0,
       stripeEventsPurged: 0,
       sessionsAbandoned: 0,
+      usersHardDeleted: 0,
     };
 
     // ── 1. Delete expired R2 exports ──────────────────────────────────────
@@ -102,6 +105,50 @@ export const dailyCleanup = schedules.task({
           .eq("status", "pending");
 
         results.sessionsAbandoned = count ?? 0;
+      }
+    }
+
+    // ── 4. Hard-delete soft-deleted users after 30 days ──────────────────
+    const userDeleteCutoff = new Date(
+      Date.now() - USER_DELETE_DAYS * 24 * 60 * 60 * 1000,
+    ).toISOString();
+
+    const { data: deletedUsers } = await supabaseAdmin
+      .from("users")
+      .select("clerk_id")
+      .not("deleted_at", "is", null)
+      .lt("deleted_at", userDeleteCutoff);
+
+    for (const u of deletedUsers ?? []) {
+      try {
+        // Delete all related data (cascades handle drafts, exports)
+        const { data: userSessions } = await supabaseAdmin
+          .from("sessions")
+          .select("id")
+          .eq("user_id", u.clerk_id);
+
+        const sessionIds = (userSessions ?? []).map((s) => s.id);
+
+        if (sessionIds.length > 0) {
+          // Delete exports, drafts, outcome_emails for these sessions
+          await supabaseAdmin.from("exports").delete().in("session_id", sessionIds);
+          await supabaseAdmin.from("drafts").delete().in("session_id", sessionIds);
+          await supabaseAdmin.from("outcome_emails").delete().in("session_id", sessionIds);
+          await supabaseAdmin.from("sessions").delete().in("id", sessionIds);
+        }
+
+        // Delete feedback
+        await supabaseAdmin.from("feedback").delete().eq("user_id", u.clerk_id);
+
+        // Delete payos_orders
+        await supabaseAdmin.from("payos_orders").delete().eq("user_id", u.clerk_id);
+
+        // Finally delete the user row
+        await supabaseAdmin.from("users").delete().eq("clerk_id", u.clerk_id);
+
+        results.usersHardDeleted++;
+      } catch (err) {
+        console.error(`[daily-cleanup] hard-delete failed for ${u.clerk_id}:`, err);
       }
     }
 
