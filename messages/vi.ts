@@ -265,10 +265,10 @@ const vi = {
       business: "Kinh doanh",
     },
     goalDescriptions: {
-      study: "Personal statement, motivation letter, học bổng",
-      job: "Cover letter, thư giới thiệu",
+      study: "Bài luận cá nhân, thư động lực, học bổng",
+      job: "Thư xin việc, thư giới thiệu",
       immigration: "Dịch tài liệu chính thức",
-      business: "Cover letter, motivation letter",
+      business: "Thư xin việc, thư động lực",
     },
     destinationHeading: "Quốc gia đích",
     outputLangHeading: "Ngôn ngữ tài liệu",
