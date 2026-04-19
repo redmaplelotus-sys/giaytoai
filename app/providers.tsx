@@ -12,11 +12,15 @@ import { SentryUserContext } from "@/app/components/SentryUserContext";
 import { setFieldLocale } from "@/lib/session/field-meta";
 
 if (typeof window !== "undefined" && clientEnv.posthogKey) {
-  posthog.init(clientEnv.posthogKey, {
-    api_host: clientEnv.posthogHost ?? "https://app.posthog.com",
-    capture_pageview: false, // handled manually by PageViewTracker
-    capture_pageleave: true,
-  });
+  // Only initialize analytics if user has consented (PDPL compliance)
+  const consent = localStorage.getItem("giaytoai_consent");
+  if (consent === "accepted") {
+    posthog.init(clientEnv.posthogKey, {
+      api_host: clientEnv.posthogHost ?? "https://app.posthog.com",
+      capture_pageview: false, // handled manually by PageViewTracker
+      capture_pageleave: true,
+    });
+  }
 }
 
 function PageViewTrackerInner() {

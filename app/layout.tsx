@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/app/providers";
 import { Navbar } from "@/components/layout/Navbar";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -56,6 +57,7 @@ export default async function RootLayout({
         <Providers locale={locale} messages={messages}>
           <Navbar />
           {children}
+          <CookieConsent />
         </Providers>
       </body>
     </html>
