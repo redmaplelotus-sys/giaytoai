@@ -209,8 +209,9 @@ export default function NewSessionPage() {
         <section className="space-y-3">
           <h2 style={labelStyle}>{t("destinationHeading")}</h2>
           <div className="flex flex-wrap gap-2">
-            {destinations.map(({ code, flag, name }) => {
+            {destinations.map(({ code, flag }) => {
               const active = destination === code;
+              const localName = (m.destinations as Record<string, string>)[code] ?? code;
               return (
                 <button
                   key={code}
@@ -220,7 +221,7 @@ export default function NewSessionPage() {
                   className={`btn-pill ${active ? "btn-pill-active" : ""}`}
                 >
                   <span aria-hidden="true">{flag}</span>
-                  <span>{name}</span>
+                  <span>{localName}</span>
                 </button>
               );
             })}
