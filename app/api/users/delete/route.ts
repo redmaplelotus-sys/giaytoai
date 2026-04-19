@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { Resend } from "resend";
@@ -10,7 +10,7 @@ import { Resend } from "resend";
 // 1. Erases PII immediately (name, email → "[deleted]")
 // 2. Sets deleted_at timestamp for 30-day hard-delete by cleanup job
 // 3. Sends confirmation email via Resend
-// 4. Does NOT delete Clerk account — user can't sign in after PII erasure
+// 4. Deletes Clerk user (prevents sign-in)
 // ---------------------------------------------------------------------------
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -120,6 +120,15 @@ export async function POST() {
       console.error("[delete-account] confirmation email failed:", err);
       // Non-fatal — account is still deleted
     }
+  }
+
+  // ── 3. Delete Clerk user (prevents sign-in) ──────────────────────────
+  try {
+    const clerk = await clerkClient();
+    await clerk.users.deleteUser(userId);
+  } catch (err) {
+    console.error("[delete-account] Clerk user deletion failed:", err);
+    // Non-fatal — PII already erased, user can't do anything useful
   }
 
   return NextResponse.json({ ok: true });
