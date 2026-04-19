@@ -13,7 +13,7 @@ export default function PrivacyPage() {
 
         <div style={{ fontSize: 15, color: "#444441", lineHeight: 1.8 }}>
           <p>
-            Giấy Tờ AI (&quot;chúng tôi&quot;) được vận hành bởi Công ty TNHH Cansea Solutions (Việt Nam)
+            Giấy Tờ AI (&quot;chúng tôi&quot;) được vận hành bởi RedMapleLotus LLC (Việt Nam)
             và Howard Hurst, Chủ doanh nghiệp cá nhân (Hoa Kỳ). Chính sách này giải thích cách
             chúng tôi thu thập, sử dụng và bảo vệ dữ liệu cá nhân của bạn.
           </p>
@@ -104,7 +104,7 @@ export default function PrivacyPage() {
           </p>
           <p>
             <strong>Email:</strong> <a href="mailto:privacy@giaytoai.com" style={linkStyle}>privacy@giaytoai.com</a><br />
-            <strong>Công ty:</strong> Công ty TNHH Cansea Solutions<br />
+            <strong>Công ty:</strong> RedMapleLotus LLC<br />
             <strong>Địa chỉ:</strong> TP. Hồ Chí Minh, Việt Nam
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
 
         <div style={{ fontSize: 15, color: "#444441", lineHeight: 1.8 }}>
           <p>
-            Giấy Tờ AI (&quot;we&quot;, &quot;us&quot;) is operated by Cansea Solutions Co., Ltd. (Vietnam)
+            Giấy Tờ AI (&quot;we&quot;, &quot;us&quot;) is operated by RedMapleLotus LLC (Vietnam)
             and Howard Hurst, Sole Proprietor (United States). This policy explains how we collect,
             use, and protect your personal data.
           </p>
@@ -216,7 +216,7 @@ export default function PrivacyPage() {
           </p>
           <p>
             <strong>Email:</strong> <a href="mailto:privacy@giaytoai.com" style={linkStyle}>privacy@giaytoai.com</a><br />
-            <strong>Company:</strong> Cansea Solutions Co., Ltd.<br />
+            <strong>Company:</strong> RedMapleLotus LLC<br />
             <strong>Address:</strong> Ho Chi Minh City, Vietnam
           </p>
         </div>
