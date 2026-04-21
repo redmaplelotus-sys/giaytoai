@@ -1,0 +1,36 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Asia/Ho_Chi_Minh"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    groups:
+      # Group patch updates together so they can be auto-merged in one PR
+      patch-updates:
+        update-types:
+          - "patch"
+      # Group minor updates together (require human review)
+      minor-updates:
+        update-types:
+          - "minor"
+
+  # GitHub Actions updates (weekly)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Asia/Ho_Chi_Minh"
+    labels:
+      - "dependencies"
+      - "github-actions"
