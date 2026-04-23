@@ -271,6 +271,7 @@ const vi = {
       business: "Thư xin việc, thư động lực",
     },
     destinationHeading: "Quốc gia đích",
+    docTypeHeading: "Loại tài liệu",
     outputLangHeading: "Ngôn ngữ tài liệu",
     wordCountLabel: "Số từ mục tiêu",
     wordCountHint: "Để trống để dùng mặc định của loại tài liệu",

@@ -272,6 +272,7 @@ const en: Translations = {
       business: "Cover letter, motivation letter",
     },
     destinationHeading: "Destination",
+    docTypeHeading: "Document type",
     outputLangHeading: "Document language",
     wordCountLabel: "Target word count",
     wordCountHint: "Leave blank to use the document type default",

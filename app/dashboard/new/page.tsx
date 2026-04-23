@@ -72,22 +72,34 @@ const DESTINATIONS: Record<Goal, Destination[]> = {
 const WORD_COUNT_DEFAULTS: Partial<Record<DocTypeSlug, number>> = {
   "personal-statement-au": 900,
   "personal-statement-us": 650,
+  "personal-statement-uk": 650,
   "cover-letter": 400,
   "motivation-letter": 600,
   "scholarship-essay": 500,
   "reference-letter": 400,
 };
 
-function resolveDocTypeSlug(goal: Goal, destination: string): DocTypeSlug {
+/**
+ * Returns the document types applicable for a given goal + destination.
+ * The first entry is the recommended default.
+ */
+function applicableDocTypes(goal: Goal, destination: string): DocTypeSlug[] {
   if (goal === "study") {
-    if (destination === "au") return "personal-statement-au";
-    if (destination === "us") return "personal-statement-us";
-    if (destination === "uk") return "personal-statement-uk";
-    return "motivation-letter";
+    const psSlug: DocTypeSlug =
+      destination === "au" ? "personal-statement-au" :
+      destination === "us" ? "personal-statement-us" :
+      destination === "uk" ? "personal-statement-uk" :
+      "motivation-letter";
+    return [psSlug, "scholarship-essay", "reference-letter"];
   }
-  if (goal === "job") return "cover-letter";
-  if (goal === "immigration") return "translation-prep";
-  return "motivation-letter"; // business
+  if (goal === "job") {
+    return ["cover-letter", "reference-letter"];
+  }
+  if (goal === "immigration") {
+    return ["translation-prep", "cover-letter"];
+  }
+  // business
+  return ["motivation-letter", "cover-letter"];
 }
 
 // ---------------------------------------------------------------------------
@@ -101,6 +113,7 @@ export default function NewSessionPage() {
 
   const [goal, setGoal] = useState<Goal | null>(null);
   const [destination, setDestination] = useState<string | null>(null);
+  const [slug, setSlug] = useState<DocTypeSlug | null>(null);
   const [outputLang, setOutputLang] = useState<OutputLanguageCode>("en");
   const [wordCount, setWordCount] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -108,14 +121,18 @@ export default function NewSessionPage() {
 
   const goals = (["study", "job", "immigration", "business"] as Goal[]);
   const destinations = goal ? DESTINATIONS[goal] : [];
+  const docTypes = goal && destination ? applicableDocTypes(goal, destination) : [];
 
   function handleGoalSelect(g: Goal) {
     setGoal(g);
     setDestination(null);
+    setSlug(null);
   }
 
-  const slug =
-    goal && destination ? resolveDocTypeSlug(goal, destination) : null;
+  function handleDestinationSelect(code: string) {
+    setDestination(code);
+    setSlug(null);
+  }
 
   const defaultWordCount = slug ? WORD_COUNT_DEFAULTS[slug] : undefined;
 
@@ -216,12 +233,48 @@ export default function NewSessionPage() {
                 <button
                   key={code}
                   type="button"
-                  onClick={() => setDestination(code)}
+                  onClick={() => handleDestinationSelect(code)}
                   aria-pressed={active}
                   className={`btn-pill ${active ? "btn-pill-active" : ""}`}
                 >
                   <span aria-hidden="true">{flag}</span>
                   <span>{localName}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ── Document type selection ── */}
+      {goal && destination && docTypes.length > 0 && (
+        <section className="space-y-3">
+          <h2 style={labelStyle}>{t("docTypeHeading")}</h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {docTypes.map((s) => {
+              const active = slug === s;
+              const meta = m.documentTypes[s];
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSlug(s)}
+                  aria-pressed={active}
+                  className="text-left transition-colors focus-visible:outline-none focus-visible:ring-2"
+                  style={{
+                    padding: "14px 16px",
+                    borderRadius: "var(--radius-lg)",
+                    border: active ? "1.5px solid var(--color-navy)" : "1px solid var(--color-border-default)",
+                    background: active ? "var(--color-blue-light)" : "var(--color-bg-surface)",
+                    cursor: "pointer",
+                  }}
+                >
+                  <p style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)", marginBottom: 4 }}>
+                    {meta.name}
+                  </p>
+                  <p style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.5, margin: 0 }}>
+                    {meta.description}
+                  </p>
                 </button>
               );
             })}

@@ -266,6 +266,7 @@ const zh: Translations = {
       business: "求职信、动机信",
     },
     destinationHeading: "目的地",
+    docTypeHeading: "文件类型",
     outputLangHeading: "文件语言",
     wordCountLabel: "目标字数",
     wordCountHint: "留空则使用该文件类型的默认字数",

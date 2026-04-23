@@ -267,6 +267,7 @@ const ko: Translations = {
       business: "커버 레터, 지원 동기서",
     },
     destinationHeading: "목적지",
+    docTypeHeading: "서류 종류",
     outputLangHeading: "서류 언어",
     wordCountLabel: "목표 단어 수",
     wordCountHint: "비워두면 서류 유형의 기본값이 사용됩니다",
