@@ -47,8 +47,9 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          # Minimum env vars to pass validate-env preflight.
-          # Real secrets are set in Vercel for actual deploys.
+          # Core env vars required by validate-env preflight.
+          # Optional vars (Stripe, R2, Resend, etc.) trigger warnings
+          # but don't block the build. Real secrets live in Vercel.
           ANTHROPIC_API_KEY: sk-ant-ci-placeholder
           CLERK_SECRET_KEY: sk_test_ci_placeholder
           CLERK_WEBHOOK_SECRET: whsec_ci_placeholder
@@ -61,15 +62,3 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://ci.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ci_placeholder
           NEXT_PUBLIC_APP_URL: https://ci.local
-          STRIPE_SECRET_KEY: sk_test_ci_placeholder
-          STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
-          STRIPE_PRICE_STARTER: price_ci_placeholder
-          STRIPE_PRICE_STANDARD: price_ci_placeholder
-          STRIPE_PRICE_PRO: price_ci_placeholder
-          STRIPE_PRICE_UNLIMITED: price_ci_placeholder
-          CF_ACCOUNT_ID: ci_placeholder
-          CF_R2_ACCESS_KEY_ID: ci_placeholder
-          CF_R2_SECRET_ACCESS_KEY: ci_placeholder
-          CF_R2_BUCKET_NAME: ci_placeholder
-          RESEND_API_KEY: re_ci_placeholder
