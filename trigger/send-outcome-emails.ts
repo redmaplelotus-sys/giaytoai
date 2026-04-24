@@ -1,6 +1,6 @@
 import { schedules } from "@trigger.dev/sdk/v3";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { Resend } from "resend";
+import { getResend, FROM_EMAIL } from "@/lib/resend";
 
 // ---------------------------------------------------------------------------
 // Job B: Hourly cron — find pending outcome emails where send_at <= now
@@ -10,8 +10,6 @@ import { Resend } from "resend";
 //                created_at, send_at
 // ---------------------------------------------------------------------------
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "noreply@giaytoai.com";
 
 export const sendOutcomeEmails = schedules.task({
   id: "send-outcome-emails",
@@ -78,7 +76,7 @@ export const sendOutcomeEmails = schedules.task({
           ? buildEnglishEmail(docNameEn, email.session_id, email.id)
           : buildVietnameseEmail(docNameVi, email.session_id, email.id);
 
-        const result = await resend.emails.send({
+        const result = await getResend().emails.send({
           from: FROM_EMAIL,
           to: user.email,
           subject,

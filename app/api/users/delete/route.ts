@@ -1,7 +1,7 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { Resend } from "resend";
+import { getResend, FROM_EMAIL } from "@/lib/resend";
 
 // ---------------------------------------------------------------------------
 // POST /api/users/delete
@@ -13,8 +13,6 @@ import { Resend } from "resend";
 // 4. Deletes Clerk user (prevents sign-in)
 // ---------------------------------------------------------------------------
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "noreply@giaytoai.com";
 
 export async function POST() {
   const { userId } = await auth();
@@ -93,7 +91,7 @@ export async function POST() {
   // ── 2. Send confirmation email ──────────────────────────────────────────
   if (userEmail && userEmail !== "[deleted]") {
     try {
-      await resend.emails.send({
+      await getResend().emails.send({
         from: FROM_EMAIL,
         to: userEmail,
         subject: "Xác nhận xóa tài khoản Giấy Tờ AI",

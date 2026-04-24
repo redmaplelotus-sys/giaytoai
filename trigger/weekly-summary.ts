@@ -1,14 +1,12 @@
 import { schedules } from "@trigger.dev/sdk/v3";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { Resend } from "resend";
+import { getResend, FROM_EMAIL } from "@/lib/resend";
 
 // ---------------------------------------------------------------------------
 // Weekly summary: every Monday 8 AM UTC (3 PM Vietnam).
 // Computes key metrics for the past 7 days and emails the founder.
 // ---------------------------------------------------------------------------
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL    = process.env.RESEND_FROM_EMAIL ?? "noreply@giaytoai.com";
 const FOUNDER_EMAIL = "canseasolutions@gmail.com";
 
 export const weeklySummary = schedules.task({
@@ -106,7 +104,7 @@ export const weeklySummary = schedules.task({
     // ── Format and send email ───────────────────────────────────────────
     const weekLabel = `${formatDate(new Date(weekAgo))} — ${formatDate(now)}`;
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: FOUNDER_EMAIL,
       subject: `📊 Giấy Tờ AI — Báo cáo tuần ${formatDate(now)}`,
