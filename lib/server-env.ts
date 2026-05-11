@@ -2,6 +2,10 @@
  * Server-only environment variables.
  * NEVER import this file in client components or any module that is
  * part of the client bundle (e.g. app/providers.tsx, lib/supabase.ts).
+ *
+ * Required values use getters so the throw is deferred until access.
+ * This lets non-Next.js runtimes (Trigger.dev task indexing, scripts,
+ * tests) import this module without crashing when vars aren't set.
  */
 
 function requireEnv(name: string): string {
@@ -10,55 +14,39 @@ function requireEnv(name: string): string {
   return value;
 }
 
-/** Returns the value or undefined — for services that degrade gracefully when absent. */
-function optionalEnv(name: string): string | undefined {
-  return process.env[name] || undefined;
-}
-
 export const serverEnv = {
-  // Anthropic — required
-  anthropicApiKey: requireEnv("ANTHROPIC_API_KEY"),
+  // Required — deferred validation
+  get anthropicApiKey()        { return requireEnv("ANTHROPIC_API_KEY"); },
+  get clerkSecretKey()         { return requireEnv("CLERK_SECRET_KEY"); },
+  get clerkWebhookSecret()     { return requireEnv("CLERK_WEBHOOK_SECRET"); },
+  get supabaseServiceRoleKey() { return requireEnv("SUPABASE_SERVICE_ROLE_KEY"); },
 
-  // Helicone — optional (LLM cost tracking proxy; skipped when unset)
-  heliconeApiKey: optionalEnv("HELICONE_API_KEY"),
+  // Optional — undefined if not set
+  heliconeApiKey:        process.env.HELICONE_API_KEY || undefined,
 
-  // Clerk — required
-  clerkSecretKey:     requireEnv("CLERK_SECRET_KEY"),
-  clerkWebhookSecret: requireEnv("CLERK_WEBHOOK_SECRET"),
+  stripeSecretKey:       process.env.STRIPE_SECRET_KEY        || undefined,
+  stripeWebhookSecret:   process.env.STRIPE_WEBHOOK_SECRET    || undefined,
+  stripePriceStarter:    process.env.STRIPE_PRICE_STARTER     || undefined,
+  stripePriceStandard:   process.env.STRIPE_PRICE_STANDARD    || undefined,
+  stripePricePro:        process.env.STRIPE_PRICE_PRO         || undefined,
+  stripePriceUnlimited:  process.env.STRIPE_PRICE_UNLIMITED   || undefined,
 
-  // Supabase — required
-  supabaseServiceRoleKey: requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
+  payosClientId:         process.env.PAYOS_CLIENT_ID          || undefined,
+  payosApiKey:           process.env.PAYOS_API_KEY            || undefined,
+  payosChecksumKey:      process.env.PAYOS_CHECKSUM_KEY       || undefined,
 
-  // Stripe — optional (payment routes fail gracefully when unset)
-  stripeSecretKey:      optionalEnv("STRIPE_SECRET_KEY"),
-  stripeWebhookSecret:  optionalEnv("STRIPE_WEBHOOK_SECRET"),
-  stripePriceStarter:   optionalEnv("STRIPE_PRICE_STARTER"),
-  stripePriceStandard:  optionalEnv("STRIPE_PRICE_STANDARD"),
-  stripePricePro:       optionalEnv("STRIPE_PRICE_PRO"),
-  stripePriceUnlimited: optionalEnv("STRIPE_PRICE_UNLIMITED"),
+  cfAccountId:           process.env.CF_ACCOUNT_ID            || undefined,
+  cfR2AccessKeyId:       process.env.CF_R2_ACCESS_KEY_ID      || undefined,
+  cfR2SecretAccessKey:   process.env.CF_R2_SECRET_ACCESS_KEY  || undefined,
+  cfR2BucketName:        process.env.CF_R2_BUCKET_NAME        || undefined,
 
-  // PayOS — optional (Vietnamese payment routes fail gracefully when unset)
-  payosClientId:    optionalEnv("PAYOS_CLIENT_ID"),
-  payosApiKey:      optionalEnv("PAYOS_API_KEY"),
-  payosChecksumKey: optionalEnv("PAYOS_CHECKSUM_KEY"),
+  upstashRedisRestUrl:   process.env.UPSTASH_REDIS_REST_URL   || undefined,
+  upstashRedisRestToken: process.env.UPSTASH_REDIS_REST_TOKEN || undefined,
 
-  // Cloudflare R2 — optional (exports/uploads return errors when unset)
-  cfAccountId:          optionalEnv("CF_ACCOUNT_ID"),
-  cfR2AccessKeyId:      optionalEnv("CF_R2_ACCESS_KEY_ID"),
-  cfR2SecretAccessKey:  optionalEnv("CF_R2_SECRET_ACCESS_KEY"),
-  cfR2BucketName:       optionalEnv("CF_R2_BUCKET_NAME"),
+  resendApiKey:          process.env.RESEND_API_KEY           || undefined,
+  resendFromEmail:       process.env.RESEND_FROM_EMAIL        || undefined,
 
-  // Upstash Redis — optional (rate limiting bypassed when unset)
-  upstashRedisRestUrl:   optionalEnv("UPSTASH_REDIS_REST_URL"),
-  upstashRedisRestToken: optionalEnv("UPSTASH_REDIS_REST_TOKEN"),
+  triggerSecretKey:      process.env.TRIGGER_SECRET_KEY       || undefined,
 
-  // Resend — optional (email sending fails gracefully when unset)
-  resendApiKey:    optionalEnv("RESEND_API_KEY"),
-  resendFromEmail: optionalEnv("RESEND_FROM_EMAIL"),
-
-  // Trigger.dev — optional (background jobs skipped when unset)
-  triggerSecretKey: optionalEnv("TRIGGER_SECRET_KEY"),
-
-  // Sentry — optional (error tracking skipped when unset)
-  sentryDsn: optionalEnv("SENTRY_DSN"),
+  sentryDsn:             process.env.SENTRY_DSN               || undefined,
 };
