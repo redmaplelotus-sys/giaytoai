@@ -1,9 +1,7 @@
-import * as Sentry from "@sentry/nextjs";
+// Sentry server-side init — production only, PII stripped, release tracked.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-// ---------------------------------------------------------------------------
-// Sentry server init — production only
-// Tagged with VERCEL_ENV and VERCEL_GIT_COMMIT_SHA for release tracking.
-// ---------------------------------------------------------------------------
+import * as Sentry from "@sentry/nextjs";
 
 if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
   Sentry.init({
@@ -13,8 +11,11 @@ if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
     environment: process.env.VERCEL_ENV ?? "unknown",
     release: process.env.VERCEL_GIT_COMMIT_SHA,
 
-    // Sampling
+    // Sampling — 10% of traces to stay well under free tier
     tracesSampleRate: 0.1,
+
+    // Privacy: do NOT send PII by default. Strip in beforeSend below.
+    sendDefaultPii: false,
 
     // Ignore client-caused errors that aren't actionable server-side
     ignoreErrors: [
@@ -36,8 +37,8 @@ if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
         // Strip auth headers
         if (event.request.headers) {
           const h = event.request.headers as Record<string, string>;
-          if (h.authorization) h.authorization = "[stripped]";
-          if (h.cookie) h.cookie = "[stripped]";
+          if (h.authorization)         h.authorization         = "[stripped]";
+          if (h.cookie)                h.cookie                = "[stripped]";
           if (h["x-clerk-auth-token"]) h["x-clerk-auth-token"] = "[stripped]";
         }
       }
@@ -55,7 +56,7 @@ if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
     // Default tags on every event
     initialScope: {
       tags: {
-        vercel_env: process.env.VERCEL_ENV ?? "unknown",
+        vercel_env:    process.env.VERCEL_ENV ?? "unknown",
         vercel_region: process.env.VERCEL_REGION ?? "unknown",
       },
     },
